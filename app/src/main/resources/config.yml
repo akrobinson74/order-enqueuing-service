@@ -1,0 +1,5 @@
+elasticSearch:
+  domainARN: arn:aws:es:eu-west-1:806353235757:domain/search
+  endpoint: https://search-search-hpxggu3ndtubx7szxue4pcxb7a.eu-west-1.es.amazonaws.com
+  kibana: https://search-search-hpxggu3ndtubx7szxue4pcxb7a.eu-west-1.es.amazonaws.com/_plugin/kibana/
+  version: 6.3

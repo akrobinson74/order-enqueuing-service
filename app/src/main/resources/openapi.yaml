@@ -1,0 +1,251 @@
+openapi: 3.0.1
+info:
+  description: "Enumeration of the endpoints the OrderEnqueuingService exposes and the expected data transfer objects"
+  title: "OrderEnqueuingService OpenAPI Spec"
+  version: "1.0.0"
+paths:
+  /create:
+    post:
+      summary: "Create a new Order resource to be enqued for processing"
+      operationId: createOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+          required: true
+      responses:
+        '201':
+          description: CREATED.  Order resource was successfully created
+          headers:
+            Location:
+              description: The URI of the created Order resource
+              schema:
+                type: string
+        '400':
+          description: INVALID EQUEST.  POST'd requestBody was not well formed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: UNPROCESSABLE_ENTITY.  A field or fields in the requestBody contains an invalid value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /order/{orderId}:
+    get:
+      operationId: getOrder
+      parameters:
+      - in: path
+        name: orderId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK.  Return the corresponding Order resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: NOT_FOUND.  No Order resource corresponds to ${orderId}
+      summary: "Obtain an Order resource possesses the same orderId in the path parameter"
+ 
+components:
+  schemas:
+    Address:
+      type: object
+      properties:
+        id:
+          description: Database id of the address
+          example: 123467890
+          format: int64
+          type: integer
+        city:
+          description: City wherein address is located
+          example: Berlin
+          type: string
+        federalState:
+          description: State wherein address is located
+          example: Berlin
+          type: string
+        latitude:
+          description: Latitudinal coordinate of the address
+          example: 52.431181
+          type: string
+        longitude:
+          description: Longitudinal coordinate of the address
+          example: 13.538744
+          type: string
+        street:
+          description: Name of the street belonging to address
+          example: Am Studio
+          type: string
+        streetNumber:
+          description: House/Street number of the address
+          example: 2a
+          type: string
+        zipCode:
+          description: Postal code of the address
+          example: 12489
+          format: int32
+          type: integer
+
+    Contact:
+      type: object
+      properties:
+        address:
+          $ref: '#/components/schemas/Address'
+        email:
+          description: Email address of the contact
+          example: michael.mente@phizzard.com
+        firstName:
+          description: First name of the contact
+          example: Michael
+          type: string
+        lastName:
+          description: Last name of the contact
+          example: Mente
+          type: string
+        phoneNumber:
+          description: Phone number at which to reach the contact
+          example: +49123456789910
+          type: string
+
+    ErrorBody:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+
+    Order:
+      type: object
+      properties:
+        id:
+          description: Database id of the product
+          example: 123467890
+          format: int64
+          type: integer
+        buyerContact:
+          $ref: '#/components/schemas/Contact'
+        deliveryContact:
+          $ref: '#/components/schemas/Contact'
+        invoiceContact:
+          $ref: '#/components/schemas/Contact'
+        orderItems:
+          items:
+            $ref: '#/components/schemas/OrderItem'
+          type: array
+        status:
+          type: string
+          enum: [PROCESSING, CANCELED, COMPLETED]
+        storeDetails:
+          $ref: '#/components/schemas/StoreDetails'
+        uuid:
+          description: An arbitrary identification string...
+          example: AF504EC2-4005-11E9-B16F-2436AB45578C
+          type: string
+          
+    OrderItem:
+      type: object
+      properties:
+        id:
+          description: Database id of the orderItem
+          example: 123467890
+          format: int64
+          type: integer
+        brandName:
+          description: Brand name of the product purchased
+        productDetails:
+          $ref: '#/components/schemas/ProductDetails'
+        productVariantDetails:
+          $ref: '#/components/schemas/ProductVariantDetails'
+        quantity:
+          description: The amount of the particular productVariant ordered
+          example: 2
+          format: int32
+          type: integer
+
+    ProductAttribute:
+      type: object
+      properties:
+        group:
+          description: An attribute applicable to products
+          enum: [APPEARANCE, DIMENSIONS, FLAGS, MISCELLANEOUS]
+          example: DIMENSIONS
+          type: string
+        name:
+          description: The name of the product attribute in question
+          enum: [ARM_LENGTH,CALF_HEIGHT,CALF_WIDTH,COLLAR,COLOR,COMFORT_WIDTH,CUT,DESIGN,HEEL,INNER_MATERIAL,IS_NEW,IS_PROMO,MATERIAL,ON_SALE,PRODUCT_CATEGORY,PRODUCT_LINE,REPLACEABLE_FOOTBED,SEASON,SEX,SHAPE,SIGNATURE,SIZE,SIZE_RANGE,SOLE_MATERIAL,TOECAP,TRANSLATION_KEY,WATERPROOF,WIDTH]
+          example: COLOR
+          type: string
+        value:
+          description: The particular value associated with the product attribute
+          example: peuce
+          type: string
+
+    ProductDetails:
+      type: object
+      properties:
+        id:
+          description: Database id of the store
+          example: 123467890
+          format: int64
+          type: integer
+        productAttributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductAttribute'
+
+    ProductVariantDetails:
+      type: object
+      properties:
+        currency:
+          description: Currency associated with the Product at the particular store location
+          example: EUR
+          type: string
+        priceType:
+          description: the price category with which this project is assocaited
+          example: sale
+          type: string
+        productVariantId:
+          description: Database id of the productVariant
+          example: 123467890
+          format: int64
+          type: integer
+        productVariantAttributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductAttribute'
+        storeDetails:
+          $ref: '#/components/schemas/StoreDetails'
+        value:
+          description: Price of the product at the give store, 
+
+    StoreDetails:
+      type: object
+      properties:
+        contactInfo:
+          $ref: '#/components/schemas/Contact'
+        id:
+          description: Database id of the store
+          example: 123467890
+          format: int64
+          type: integer
+        name:
+          description: name of the store associated with the Order
+          example: FootLocker
+          type: string
+        type:
+          description: category of the store associated with the Order
+          example: Sporting Goods
+          type: string
+# Added by API Auto Mocking Plugin
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/phizzard/order-enqueuing_service_open_api_spec/1.0.0

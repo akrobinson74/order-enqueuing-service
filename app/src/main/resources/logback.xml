@@ -1,0 +1,20 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%d{YYYY-MM-dd HH:mm:ss.SSS}] [%thread] [%-5level] %logger{36} - %msg%n</pattern>
+        </encoder>
+        <!--<encoder class="net.logstash.logback.encoder.LogstashEncoder">-->
+            <!--<fieldNames class="net.logstash.logback.fieldnames.ShortenedFieldNames">-->
+                <!--<timestamp>timestamp</timestamp>-->
+                <!--<levelValue>[ignore]</levelValue>-->
+                <!--<version>[ignore]</version>-->
+            <!--</fieldNames>-->
+            <!--<timestampPattern>[UNIX_TIMESTAMP_AS_NUMBER]</timestampPattern>-->
+        <!--</encoder>-->
+    </appender>
+
+    <root level="debug">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

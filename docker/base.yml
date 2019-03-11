@@ -1,0 +1,43 @@
+version: '3.7'
+
+services:
+  mongo1:
+    hostname: mongo1
+    container_name: localmongo1
+    image: mongo:4.0-xenial
+    expose:
+      - 27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+  mongo2:
+    hostname: mongo2
+    container_name: localmongo2
+    image: mongo:4.0-xenial
+    expose:
+      - 27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+  mongo3:
+    hostname: mongo3
+    container_name: localmongo3
+    image: mongo:4.0-xenial
+    expose:
+      - 27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+  order_enqueuing_service:
+    build: app
+    container_name: order_enqueuing_service
+    image: order_enqueuing_service
+    networks:
+    - docker_order_enqueuing_service
+    ports:
+    - "8079:8080"
+    volumes:
+    - ./app/build/api.yml:/opt/api.yml
+    environment:
+    - OPENAPI_PATH=/opt/api.yml
+
+networks:
+  docker_order_enqueuing_service:
+    external: true

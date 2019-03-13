@@ -34,7 +34,7 @@ object Versions {
 
     const val io_mockk: String = "1.9.1.kotlin12"
 
-    const val io_vertx: String = "3.6.3" // available: "3.6.3"
+    const val io_vertx: String = "3.6.2" // available: "3.6.3"
 
     const val logstash_logback_encoder: String = "5.3" 
 

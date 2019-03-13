@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.0.0
 info:
   description: "Enumeration of the endpoints the OrderEnqueuingService exposes and the expected data transfer objects"
   title: "OrderEnqueuingService OpenAPI Spec"
@@ -9,11 +9,11 @@ paths:
       summary: "Create a new Order resource to be enqued for processing"
       operationId: createOrder
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Order'
-          required: true
       responses:
         '201':
           description: CREATED.  Order resource was successfully created
@@ -36,6 +36,7 @@ paths:
                 $ref: '#/components/schemas/ErrorBody'
   /order/{orderId}:
     get:
+      summary: "Obtain an Order resource possesses the same orderId in the path parameter"
       operationId: getOrder
       parameters:
       - in: path
@@ -52,8 +53,22 @@ paths:
                 $ref: '#/components/schemas/Order'
         '404':
           description: NOT_FOUND.  No Order resource corresponds to ${orderId}
-      summary: "Obtain an Order resource possesses the same orderId in the path parameter"
- 
+  /health:
+    get:
+      summary: Health Check endpoint
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is OK
+        '503':
+          description: Service is KO
+  /metrics:
+    get:
+      summary: Endpoint for Prometheus metrics
+      operationId: metrics
+      responses:
+        '200':
+          description: Get prometheus metrics
 components:
   schemas:
     Address:

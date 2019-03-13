@@ -1,7 +1,6 @@
 package com.phizzard.es
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.phizzard.es.models.Address
@@ -10,72 +9,72 @@ const val SAMPLE_ADDRESS = """
 {
   "id": 123467890,
   "city": "Berlin",
-  "federal_state": "Berlin",
+  "federalState": "Berlin",
   "latitude": 52.431181,
   "longitude": 13.538744,
   "street": "Am Studio",
-  "street_number": "2a",
-  "zip_code": 12489
+  "streetNumber": "2a",
+  "zipCode": 12489
 }
 """
 const val SAMPLE_ORDER = """
 {
   "id": 123467890,
-  "buyer_contact": {
+  "buyerContact": {
     "address": {
       "id": 123467890,
       "city": "Berlin",
-      "federal_state": "Berlin",
+      "federalState": "Berlin",
       "latitude": 52.431181,
       "longitude": 13.538744,
       "street": "Am Studio",
-      "street_number": "2a",
-      "zip_code": 12489
+      "streetNumber": "2a",
+      "zipCode": 12489
     },
     "email": "michael.mente@phizzard.com",
-    "first_name": "Michael",
-    "last_name": "Mente",
-    "phone_number": 49123456789910
+    "firstName": "Michael",
+    "lastName": "Mente",
+    "phoneNumber": 49123456789910
   },
-  "delivery_contact": {
+  "deliveryContact": {
     "address": {
       "id": 123467890,
       "city": "Berlin",
-      "federal_state": "Berlin",
+      "federalState": "Berlin",
       "latitude": 52.431181,
       "longitude": 13.538744,
       "street": "Am Studio",
-      "street_number": "2a",
-      "zip_code": 12489
+      "streetNumber": "2a",
+      "zipCode": 12489
     },
     "email": "michael.mente@phizzard.com",
-    "first_name": "Michael",
-    "last_name": "Mente",
-    "phone_number": 49123456789910
+    "firstName": "Michael",
+    "lastName": "Mente",
+    "phoneNumber": 49123456789910
   },
-  "invoice_contact": {
+  "invoiceContact": {
     "address": {
       "id": 123467890,
       "city": "Berlin",
-      "federal_state": "Berlin",
+      "federalState": "Berlin",
       "latitude": 52.431181,
       "longitude": 13.538744,
       "street": "Am Studio",
-      "street_number": "2a",
-      "zip_code": 12489
+      "streetNumber": "2a",
+      "zipCode": 12489
     },
     "email": "michael.mente@phizzard.com",
-    "first_name": "Michael",
-    "last_name": "Mente",
-    "phone_number": 49123456789910
+    "firstName": "Michael",
+    "lastName": "Mente",
+    "phoneNumber": 49123456789910
   },
-  "order_items": [
+  "orderItems": [
     {
       "id": 123467890,
-      "brand_name": "string",
-      "product_details": {
+      "brandName": "string",
+      "productDetails": {
         "id": 123467890,
-        "product_attributes": [
+        "productAttributes": [
           {
             "group": "DIMENSIONS",
             "name": "COLOR",
@@ -83,33 +82,33 @@ const val SAMPLE_ORDER = """
           }
         ]
       },
-      "product_variant_details": {
+      "productVariantDetails": {
         "currency": "EUR",
-        "price_type": "sale",
-        "product_variant_id": 123467890,
-        "product_variant_attributes": [
+        "priceType": "sale",
+        "productVariantId": 123467890,
+        "productVariantAttributes": [
           {
             "group": "DIMENSIONS",
             "name": "COLOR",
             "value": "peuce"
           }
         ],
-        "store_details": {
-          "contact_info": {
+        "storeDetails": {
+          "contactInfo": {
             "address": {
               "id": 123467890,
               "city": "Berlin",
-              "federal_state": "Berlin",
+              "federalState": "Berlin",
               "latitude": 52.431181,
               "longitude": 13.538744,
               "street": "Am Studio",
-              "street_number": "2a",
-              "zip_code": 12489
+              "streetNumber": "2a",
+              "zipCode": 12489
             },
             "email": "michael.mente@phizzard.com",
-            "first_name": "Michael",
-            "last_name": "Mente",
-            "phone_number": 49123456789910
+            "firstName": "Michael",
+            "lastName": "Mente",
+            "phoneNumber": 49123456789910
           },
           "id": 123467890,
           "name": "FootLocker",
@@ -120,22 +119,22 @@ const val SAMPLE_ORDER = """
     }
   ],
   "status": "PROCESSING",
-  "store_details": {
-    "contact_info": {
+  "storeDetails": {
+    "contactInfo": {
       "address": {
         "id": 123467890,
         "city": "Berlin",
-        "federal_state": "Berlin",
+        "federalState": "Berlin",
         "latitude": 52.431181,
         "longitude": 13.538744,
         "street": "Am Studio",
-        "street_number": "2a",
-        "zip_code": 12489
+        "streetNumber": "2a",
+        "zipCode": 12489
       },
       "email": "michael.mente@phizzard.com",
-      "first_name": "Michael",
-      "last_name": "Mente",
-      "phone_number": 49123456789910
+      "firstName": "Michael",
+      "lastName": "Mente",
+      "phoneNumber": 49123456789910
     },
     "id": 123467890,
     "name": "FootLocker",
@@ -146,6 +145,6 @@ const val SAMPLE_ORDER = """
 """
 
 val snakeCaseMapper = ObjectMapper()
-    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+//    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
     .registerKotlinModule()
 val sampleOrderJson = snakeCaseMapper.readValue<Address>(SAMPLE_ORDER)

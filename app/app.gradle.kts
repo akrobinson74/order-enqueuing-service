@@ -42,7 +42,7 @@ dependencies {
 // -------------------------- Building Application ----------------------------
 
 application {
-    mainClassName = "com.phizzard.es.MainKt"
+    mainClassName = "com.phizzard.es.AppKt"
 }
 
 val copyNewRelicAgent by tasks.creating(Copy::class) {

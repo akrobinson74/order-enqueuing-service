@@ -28,13 +28,13 @@ dependencies {
     api(Libs.vertx_mongo_client)
     api(Libs.vertx_web)
     api(Libs.vertx_web_api_contract)
+    api(Libs.vertx_web_client)
 
     runtimeOnly(Libs.logback_classic)
 
     testImplementation(Libs.embedded_mongo)
     testImplementation(Libs.io_mockk)
     testImplementation(Libs.test_containers)
-    testImplementation(Libs.vertx_web_client)
 
     newrelic(Libs.newrelic_agent)
 }

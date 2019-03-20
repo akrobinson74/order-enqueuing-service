@@ -6,35 +6,48 @@ import com.newrelic.api.agent.NewRelic
 import com.phizzard.es.DEFAULT_HTTP_PORT
 import com.phizzard.es.HTTP_PORT
 import com.phizzard.es.handlers.OrderStorageHandler
+import com.phizzard.es.handlers.defaultErrorHandler
+import com.phizzard.es.handlers.handleOpenApiValidationError
+import com.phizzard.es.mongoConfig
+import com.phizzard.es.prometheusHandler
 import com.phizzard.es.requestMarker
 import io.vertx.core.json.Json
+import io.vertx.core.json.JsonObject
+import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.api.contract.openapi3.OpenAPI3RouterFactory
 import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.kotlin.core.http.listenAwait
 import io.vertx.kotlin.coroutines.CoroutineVerticle
-import io.vertx.kotlin.ext.web.api.contract.RouterFactoryOptions
 import io.vertx.kotlin.ext.web.api.contract.openapi3.OpenAPI3RouterFactory.createAwait
+import io.vertx.kotlin.ext.web.api.contract.routerFactoryOptionsOf
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
 class BootstrapVerticle : CoroutineVerticle() {
+
+    private val mongoConfig: JsonObject by lazy { config.mongoConfig }
 
     override suspend fun start() {
         logger.info("Starting BootstrapVerticle")
 
         registerJacksonModules()
 
-        val routerOptions = RouterFactoryOptions(
+        val routerOptions = routerFactoryOptionsOf(
             mountValidationFailureHandler = true,
             mountNotImplementedHandler = true
         )
 
+        val mongoClient = MongoClient.createShared(vertx, JsonObject())
+
         val router = createAwait(vertx, OPEN_API_PATH)
+            .addFailureHandlerByOperationId(CREATE_OAS_OPERATION_ID, ::defaultErrorHandler)
+            .addHandlerByOperationId(METRICS, ::prometheusHandler)
             .addSuspendingHandlerByOperationId(
-                handler = OrderStorageHandler()::handle,
+                handler = OrderStorageHandler(mongoClient)::handle,
                 operationId = CREATE_OAS_OPERATION_ID
             )
+            .setValidationFailureHandler(::handleOpenApiValidationError)
             .setBodyHandler(BodyHandler.create(false))
             .setOptions(routerOptions)
             .router
@@ -68,6 +81,8 @@ class BootstrapVerticle : CoroutineVerticle() {
     companion object {
         private val logger = LoggerFactory.getLogger(BootstrapVerticle::class.java)
         private const val CREATE_OAS_OPERATION_ID = "createOrder"
+        private const val HEALTHCHECK = "healthCheck"
+        private const val METRICS = "metrics"
         private const val OPEN_API_PATH = "/openapi.yaml"
     }
 }

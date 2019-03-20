@@ -1,5 +1,7 @@
 package com.phizzard.es.models
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY
 import java.math.BigInteger
 
 enum class AttributeGroup {
@@ -98,4 +100,9 @@ data class StoreDetails(
     val contactInfo: Contact,
     val name: String,
     val type: String
+)
+
+data class ErrorBody(
+    val errors: List<String>,
+    @JsonInclude(NON_EMPTY) val msg: String = ""
 )

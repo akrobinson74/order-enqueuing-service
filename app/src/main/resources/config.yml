@@ -3,3 +3,6 @@ elasticSearch:
   endpoint: https://search-search-hpxggu3ndtubx7szxue4pcxb7a.eu-west-1.es.amazonaws.com
   kibana: https://search-search-hpxggu3ndtubx7szxue4pcxb7a.eu-west-1.es.amazonaws.com/_plugin/kibana/
   version: 6.3
+mongoConfig:
+  host: 127.0.0.1
+  port: 27071

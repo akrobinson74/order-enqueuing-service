@@ -1,7 +1,5 @@
 package com.phizzard.es
 
-const val COMPOSITE_REGISTRY_NAME = "composite"
-
 // Environment variables
 const val HTTP_PORT = "HTTP_PORT"
 

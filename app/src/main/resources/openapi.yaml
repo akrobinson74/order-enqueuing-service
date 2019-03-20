@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   description: "Enumeration of the endpoints the OrderEnqueuingService exposes and the expected data transfer objects"
   title: "OrderEnqueuingService OpenAPI Spec"
-  version: "1.0.0"
+  version: "1.0.2"
 paths:
   /create:
     post:
@@ -90,11 +90,11 @@ components:
         latitude:
           description: Latitudinal coordinate of the address
           example: 52.431181
-          type: string
+          type: number
         longitude:
           description: Longitudinal coordinate of the address
           example: 13.538744
-          type: string
+          type: number
         street:
           description: Name of the street belonging to address
           example: Am Studio
@@ -108,6 +108,11 @@ components:
           example: 12489
           format: int32
           type: integer
+      required:
+        - city
+        - street
+        - streetNumber
+        - zipCode
 
     Contact:
       type: object
@@ -127,8 +132,14 @@ components:
           type: string
         phoneNumber:
           description: Phone number at which to reach the contact
-          example: +49123456789910
+          example: '+49123456789910'
           type: string
+      required:
+        - address
+        - email
+        - firstName
+        - lastName
+        - phoneNumber
 
     ErrorBody:
       type: object
@@ -165,6 +176,11 @@ components:
           description: An arbitrary identification string...
           example: AF504EC2-4005-11E9-B16F-2436AB45578C
           type: string
+      required:
+        - buyerContact
+        - orderItems
+        - status
+        - storeDetails
           
     OrderItem:
       type: object
@@ -185,6 +201,11 @@ components:
           example: 2
           format: int32
           type: integer
+      required:
+        - brandName
+        - productDetails
+        - productVariantDetails
+        - quantity
 
     ProductAttribute:
       type: object
@@ -203,6 +224,10 @@ components:
           description: The particular value associated with the product attribute
           example: peuce
           type: string
+      required:
+        - group
+        - name
+        - value
 
     ProductDetails:
       type: object
@@ -216,6 +241,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProductAttribute'
+      required:
+        - productAttributes
 
     ProductVariantDetails:
       type: object
@@ -240,7 +267,15 @@ components:
         storeDetails:
           $ref: '#/components/schemas/StoreDetails'
         value:
-          description: Price of the product at the give store, 
+          description: Price of the product at the given store
+          example: 19.95
+          type: number
+      required:
+        - currency
+        - priceType
+        - productVariantAttributes
+        - storeDetails
+        - value
 
     StoreDetails:
       type: object
@@ -260,6 +295,9 @@ components:
           description: category of the store associated with the Order
           example: Sporting Goods
           type: string
+      required:
+        - name
+        - type
 # Added by API Auto Mocking Plugin
 servers:
   - description: SwaggerHub API Auto Mocking

@@ -5,6 +5,6 @@
 build
 
 .idea
-out/
+out
 *.bak
 *.log

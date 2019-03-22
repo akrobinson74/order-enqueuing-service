@@ -1,5 +1,6 @@
 package com.phizzard.es.handlers
 
+import com.phizzard.es.ORDERS_COLLECTION_NAME
 import com.phizzard.es.models.ErrorBody
 import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
@@ -14,7 +15,7 @@ class OrderStorageHandler(private val mongoClient: MongoClient) {
 
         val order = context.bodyAsJson
 
-        mongoClient.save(ORDERS_COLLECTION, order) { result ->
+        mongoClient.save(ORDERS_COLLECTION_NAME, order) { result ->
             when (result.succeeded()) {
                 true -> context.response()
                     .setStatusCode(SC_CREATED)
@@ -32,5 +33,3 @@ class OrderStorageHandler(private val mongoClient: MongoClient) {
         private val logger = LoggerFactory.getLogger(OrderStorageHandler::class.java)
     }
 }
-
-const val ORDERS_COLLECTION = "orders"

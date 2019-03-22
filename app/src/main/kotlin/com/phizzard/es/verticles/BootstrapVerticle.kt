@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.newrelic.api.agent.NewRelic
 import com.phizzard.es.DEFAULT_HTTP_PORT
 import com.phizzard.es.HTTP_PORT
+import com.phizzard.es.handlers.OrderRetrievalHandler
 import com.phizzard.es.handlers.OrderStorageHandler
 import com.phizzard.es.handlers.defaultErrorHandler
 import com.phizzard.es.handlers.handleOpenApiValidationError
@@ -41,11 +42,15 @@ class BootstrapVerticle : CoroutineVerticle() {
         val mongoClient = MongoClient.createShared(vertx, JsonObject())
 
         val router = createAwait(vertx, OPEN_API_PATH)
-            .addFailureHandlerByOperationId(CREATE_OAS_OPERATION_ID, ::defaultErrorHandler)
+            .addFailureHandlerByOperationId(CREATE_ORDER_OPERATION_ID, ::defaultErrorHandler)
             .addHandlerByOperationId(METRICS, ::prometheusHandler)
             .addSuspendingHandlerByOperationId(
                 handler = OrderStorageHandler(mongoClient)::handle,
-                operationId = CREATE_OAS_OPERATION_ID
+                operationId = CREATE_ORDER_OPERATION_ID
+            )
+            .addSuspendingHandlerByOperationId(
+                handler = OrderRetrievalHandler(mongoClient)::handle,
+                operationId = GET_ORDER_OPERATION_ID
             )
             .setValidationFailureHandler(::handleOpenApiValidationError)
             .setBodyHandler(BodyHandler.create(false))
@@ -80,7 +85,8 @@ class BootstrapVerticle : CoroutineVerticle() {
 
     companion object {
         private val logger = LoggerFactory.getLogger(BootstrapVerticle::class.java)
-        private const val CREATE_OAS_OPERATION_ID = "createOrder"
+        private const val CREATE_ORDER_OPERATION_ID = "createOrder"
+        private const val GET_ORDER_OPERATION_ID = "getOrder"
         private const val HEALTHCHECK = "healthCheck"
         private const val METRICS = "metrics"
         private const val OPEN_API_PATH = "/openapi.yaml"

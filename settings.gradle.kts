@@ -7,7 +7,7 @@ pluginManagement {
 include("app", "integration-test")
 
 with(rootProject) {
-    name = "order_enqueuing_service"
+    name = "order-enqueuing-service"
     children.forEach { it.buildFileName = "${it.name}.gradle.kts" }
 }
 

@@ -4,17 +4,36 @@
         <encoder>
             <pattern>[%d{YYYY-MM-dd HH:mm:ss.SSS}] [%thread] [%-5level] %logger{36} - %msg%n</pattern>
         </encoder>
-        <!--<encoder class="net.logstash.logback.encoder.LogstashEncoder">-->
-            <!--<fieldNames class="net.logstash.logback.fieldnames.ShortenedFieldNames">-->
-                <!--<timestamp>timestamp</timestamp>-->
-                <!--<levelValue>[ignore]</levelValue>-->
-                <!--<version>[ignore]</version>-->
-            <!--</fieldNames>-->
-            <!--<timestampPattern>[UNIX_TIMESTAMP_AS_NUMBER]</timestampPattern>-->
-        <!--</encoder>-->
+<!--        <encoder class="net.logstash.logback.encoder.LogstashEncoder">-->
+<!--            <fieldNames class="net.logstash.logback.fieldnames.ShortenedFieldNames">-->
+<!--                <timestamp>timestamp</timestamp>-->
+<!--                <levelValue>[ignore]</levelValue>-->
+<!--                <version>[ignore]</version>-->
+<!--            </fieldNames>-->
+<!--            <timestampPattern>[UNIX_TIMESTAMP_AS_NUMBER]</timestampPattern>-->
+<!--        </encoder>-->
     </appender>
 
-    <root level="info">
+    <appender name="LOG" class="ch.qos.logback.core.FileAppender">
+        <file>oes.log</file>
+        <append>true</append>
+        <!-- set immediateFlush to false for much higher logging throughput -->
+        <immediateFlush>true</immediateFlush>
+        <encoder>
+            <pattern>[%d{YYYY-MM-dd HH:mm:ss.SSS}] [%thread] [%-5level] %logger{36} - %msg%n</pattern>
+        </encoder>
+<!--        <encoder class="net.logstash.logback.encoder.LogstashEncoder">-->
+<!--            <fieldNames class="net.logstash.logback.fieldnames.ShortenedFieldNames">-->
+<!--                <timestamp>timestamp</timestamp>-->
+<!--                <levelValue>[ignore]</levelValue>-->
+<!--                <version>[ignore]</version>-->
+<!--            </fieldNames>-->
+<!--            <timestampPattern>[UNIX_TIMESTAMP_AS_NUMBER]</timestampPattern>-->
+<!--        </encoder>-->
+    </appender>
+
+    <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="LOG" />
     </root>
 </configuration>

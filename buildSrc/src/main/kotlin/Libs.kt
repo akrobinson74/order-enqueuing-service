@@ -8,6 +8,8 @@ object Libs {
      * http://logback.qos.ch */
     const val logback_classic: String = "ch.qos.logback:logback-classic:" + Versions.logback_classic
 
+    const val aws_sqs_msg_lib: String = "com.amazonaws:amazon-sqs-java-messaging-lib:" + Versions.aws_sqs_msg_lib
+
     /**
      * https://github.com/auth0/java-jwt */
     const val java_jwt: String = "com.auth0:java-jwt:" + Versions.java_jwt
@@ -45,6 +47,8 @@ object Libs {
      * https://github.com/nhaarman/mockito-kotlin */
     const val mockito_kotlin: String = "com.nhaarman.mockitokotlin2:mockito-kotlin:" +
         Versions.mockito_kotlin
+
+    const val okhttp3_mockwebserver: String = "com.squareup.okhttp3:mockwebserver:" + Versions.okhttp3_mockwebserver
 
     const val embedded_mongo: String = "de.flapdoodle.embed:de.flapdoodle.embed.mongo:" +
         Versions.embedded_mongo
@@ -115,6 +119,8 @@ object Libs {
     /**
      * http://www.bouncycastle.org/java.html */
     const val bcprov_jdk15on: String = "org.bouncycastle:bcprov-jdk15on:" + Versions.bcprov_jdk15on
+
+    const val elastimq_sqs: String = "org.elasticmq:elasticmq-rest-sqs_2.12:" + Versions.elastimq_sqs
 
     const val org_jetbrains_kotlin_jvm_gradle_plugin: String =
         "org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin:" +

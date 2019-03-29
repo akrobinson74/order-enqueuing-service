@@ -4,7 +4,7 @@ services:
   mongo1:
     hostname: mongo1
     container_name: localmongo1
-    image: mongo:4.0-xenial
+    image: mongo:3.6-jessie
     expose:
       - 27017
     restart: always
@@ -12,7 +12,7 @@ services:
   mongo2:
     hostname: mongo2
     container_name: localmongo2
-    image: mongo:4.0-xenial
+    image: mongo:3.6-jessie
     expose:
       - 27017
     restart: always
@@ -20,24 +20,53 @@ services:
   mongo3:
     hostname: mongo3
     container_name: localmongo3
-    image: mongo:4.0-xenial
+    image: mongo:3.6-jessie
     expose:
       - 27017
     restart: always
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
-  order_enqueuing_service:
+  mongosetup:
+    image: mongo:3.6-jessie
+    links:
+      - mongo1:mongo1
+      - mongo2:mongo2
+      - mongo3:mongo3
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    volumes:
+      - ../localmongo:/scripts
+    restart: "no"
+    entrypoint: [ "bash", "/scripts/mongo_setup.sh" ]
+  order-enqueuing-service:
     build: app
-    container_name: order_enqueuing_service
-    image: order_enqueuing_service
+    container_name: order-enqueuing-service
+    image: order-enqueuing-service
     networks:
     - docker_order_enqueuing_service
+    - default
+    - localmongo
     ports:
-    - "8079:8080"
+    - "8080:8080"
     volumes:
     - ./app/build/api.yml:/opt/api.yml
     environment:
     - OPENAPI_PATH=/opt/api.yml
+    external_links:
+      - localmongo1:mongo1
+      - localmongo2:mongo2
+      - localmongo3:mongo3
+  elasticmq:
+    build: elasticmq
+    container_name: order_queue
+    networks:
+      - docker_order_enqueuing_service
+    ports:
+      - "9324:9324"
 
 networks:
+  localmongo:
+    external:
+      name: localmongo_default
   docker_order_enqueuing_service:
-    external: true

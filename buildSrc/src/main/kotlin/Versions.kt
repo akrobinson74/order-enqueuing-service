@@ -5,6 +5,12 @@
  *
  * YOU are responsible for updating manually the dependency version. */
 object Versions {
+    const val aws_sqs_msg_lib: String = "1.0.5"
+
+    const val okhttp3_mockwebserver = "3.14.0"
+
+    const val elastimq_sqs = "0.14.6"
+
     const val logback_classic: String = "1.2.3" 
 
     const val java_jwt: String = "3.6.0" // available: "3.7.0"

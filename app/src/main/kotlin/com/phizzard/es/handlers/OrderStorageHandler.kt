@@ -1,11 +1,11 @@
 package com.phizzard.es.handlers
 
+import com.phizzard.es.MONGO_ID
 import com.phizzard.es.ORDERS_COLLECTION_NAME
 import com.phizzard.es.models.ErrorBody
 import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.streams.end
-import org.apache.http.HttpStatus.SC_CREATED
 import org.slf4j.LoggerFactory
 
 class OrderStorageHandler(private val mongoClient: MongoClient) {
@@ -17,10 +17,7 @@ class OrderStorageHandler(private val mongoClient: MongoClient) {
 
         mongoClient.save(ORDERS_COLLECTION_NAME, order) { result ->
             when (result.succeeded()) {
-                true -> context.response()
-                    .setStatusCode(SC_CREATED)
-                    .putHeader("Location", "/orders/${result.result()}")
-                    .end("You are awesome!")
+                true -> context.put(MONGO_ID, result.result()).next()
 
                 else -> context.response()
                     .setStatusCode(500)

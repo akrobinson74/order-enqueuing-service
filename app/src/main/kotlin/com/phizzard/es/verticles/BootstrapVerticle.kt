@@ -1,17 +1,12 @@
 package com.phizzard.es.verticles
 
 import arrow.core.Try
+import com.amazonaws.services.sqs.AmazonSQS
+import com.amazonaws.services.sqs.AmazonSQSClientBuilder
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.newrelic.api.agent.NewRelic
-import com.phizzard.es.DEFAULT_HTTP_PORT
-import com.phizzard.es.HTTP_PORT
-import com.phizzard.es.handlers.OrderRetrievalHandler
-import com.phizzard.es.handlers.OrderStorageHandler
-import com.phizzard.es.handlers.defaultErrorHandler
-import com.phizzard.es.handlers.handleOpenApiValidationError
-import com.phizzard.es.mongoConfig
-import com.phizzard.es.prometheusHandler
-import com.phizzard.es.requestMarker
+import com.phizzard.es.*
+import com.phizzard.es.handlers.*
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.mongo.MongoClient
@@ -40,12 +35,18 @@ class BootstrapVerticle : CoroutineVerticle() {
         )
 
         val mongoClient = MongoClient.createShared(vertx, JsonObject())
+        val sqsClient: AmazonSQS = AmazonSQSClientBuilder.standard()
+            .build()
 
         val router = createAwait(vertx, OPEN_API_PATH)
             .addFailureHandlerByOperationId(CREATE_ORDER_OPERATION_ID, ::defaultErrorHandler)
             .addHandlerByOperationId(METRICS, ::prometheusHandler)
             .addSuspendingHandlerByOperationId(
                 handler = OrderStorageHandler(mongoClient)::handle,
+                operationId = CREATE_ORDER_OPERATION_ID
+            )
+            .addSuspendingHandlerByOperationId(
+                handler = MessageEnqueuingHandler(sqsClient)::handle,
                 operationId = CREATE_ORDER_OPERATION_ID
             )
             .addSuspendingHandlerByOperationId(

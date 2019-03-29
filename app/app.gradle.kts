@@ -10,6 +10,7 @@ plugins {
 val newrelic by configurations.creating
 
 dependencies {
+    api(Libs.aws_sqs_msg_lib)
     api(Libs.bcprov_jdk15on)
     api(Libs.jackson_datatype_jsr310)
     api(Libs.jackson_module_kotlin)
@@ -32,6 +33,7 @@ dependencies {
 
     runtimeOnly(Libs.logback_classic)
 
+    testImplementation(Libs.elastimq_sqs)
     testImplementation(Libs.embedded_mongo)
     testImplementation(Libs.io_mockk)
     testImplementation(Libs.test_containers)

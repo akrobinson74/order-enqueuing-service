@@ -3,8 +3,8 @@ package com.phizzard.es
 import io.vertx.config.ConfigRetriever
 import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
-import io.vertx.kotlin.config.ConfigRetrieverOptions
-import io.vertx.kotlin.config.ConfigStoreOptions
+import io.vertx.kotlin.config.configRetrieverOptionsOf
+import io.vertx.kotlin.config.configStoreOptionsOf
 import io.vertx.kotlin.config.getConfigAwait
 import io.vertx.kotlin.core.json.JsonObject
 
@@ -19,21 +19,36 @@ val JsonObject.elasticSearch: ElasticsearchConfig
     get() = getJsonObject("elasticSearch").mapTo(ElasticsearchConfig::class.java)
 
 data class MongoConfig(
-    val host: String,
-    val port: String
+    val connection_string: String = "mongodb://127.0.0.1",
+    val db_name: String = "orders",
+    val host: String = "127.0.0.1",
+    val password: String = "",
+    val port: Int = 27017,
+    val username: String = ""
 )
 
 val JsonObject.mongoConfig: JsonObject
     get() = getJsonObject("mongoConfig")
 
+data class SqsConfig(
+    val accessKeyId: String = "x",
+    val queueName: String = "order",
+    val secretAccessKey: String = "x",
+    val serviceEndpoint: String = "http://localhost:9324",
+    val signingRegion: String = "elasticmq"
+)
+
+val JsonObject.sqsConfig: SqsConfig
+    get() = SqsConfig()
+
 suspend fun obtainConfiguration(vertx: Vertx, configurationPath: String): JsonObject {
-    val envStore = ConfigStoreOptions(type = "env")
-    val yamlStore = ConfigStoreOptions(
+    val envStore = configStoreOptionsOf(type = "env")
+    val yamlStore = configStoreOptionsOf(
         type = "file",
         format = "yaml",
         config = JsonObject("path" to configurationPath)
     )
     return ConfigRetriever
-        .create(vertx, ConfigRetrieverOptions(stores = listOf(envStore, yamlStore)))
+        .create(vertx, configRetrieverOptionsOf(stores = listOf(envStore, yamlStore)))
         .getConfigAwait()
 }

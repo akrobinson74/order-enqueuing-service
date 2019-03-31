@@ -15,7 +15,7 @@
     </appender>
 
     <appender name="LOG" class="ch.qos.logback.core.FileAppender">
-        <file>oes.log</file>
+        <file>/var/log/oes.log</file>
         <append>true</append>
         <!-- set immediateFlush to false for much higher logging throughput -->
         <immediateFlush>true</immediateFlush>

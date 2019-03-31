@@ -7,8 +7,8 @@ import io.micrometer.prometheus.PrometheusMeterRegistry
 import io.prometheus.client.exporter.common.TextFormat
 import io.vertx.core.http.HttpHeaders
 import io.vertx.ext.web.RoutingContext
-import io.vertx.kotlin.micrometer.MicrometerMetricsOptions
-import io.vertx.kotlin.micrometer.VertxPrometheusOptions
+import io.vertx.kotlin.micrometer.micrometerMetricsOptionsOf
+import io.vertx.kotlin.micrometer.vertxPrometheusOptionsOf
 import io.vertx.micrometer.MicrometerMetricsOptions
 import io.vertx.micrometer.backends.BackendRegistries
 import io.vertx.micrometer.backends.PrometheusBackendRegistry
@@ -16,7 +16,7 @@ import org.apache.http.HttpStatus
 
 fun buildMetricsOptions(): MicrometerMetricsOptions {
     val registries = mutableListOf(
-        PrometheusBackendRegistry(VertxPrometheusOptions(enabled = true, publishQuantiles = true)).meterRegistry
+        PrometheusBackendRegistry(vertxPrometheusOptionsOf(enabled = true, publishQuantiles = true)).meterRegistry
     )
     if (!System.getenv(NR_INSIGHTS_KEY).isNullOrEmpty()) {
         registries += NewRelicMeterRegistry(
@@ -27,7 +27,7 @@ fun buildMetricsOptions(): MicrometerMetricsOptions {
             }, io.micrometer.core.instrument.Clock.SYSTEM
         ).also { it.config().commonTags("appName", System.getenv(NEW_RELIC_APP_NAME)) }
     }
-    return MicrometerMetricsOptions(registryName = COMPOSITE_REGISTRY_NAME, enabled = true, jvmMetricsEnabled = true)
+    return micrometerMetricsOptionsOf(registryName = COMPOSITE_REGISTRY_NAME, enabled = true, jvmMetricsEnabled = true)
         .setMicrometerRegistry(CompositeMeterRegistry(io.micrometer.core.instrument.Clock.SYSTEM, registries))
 }
 

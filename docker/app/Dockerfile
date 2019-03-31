@@ -14,4 +14,4 @@ COPY build/newrelic.yml /opt/newrelic/newrelic.yml
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "order-enqueuing-service.jar", "com.phizzard.es.AppKt", "src/main/resources/config.yml"]
+CMD ["java", "-jar", "order-enqueuing-service.jar", "/opt/config.yml"]

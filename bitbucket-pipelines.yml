@@ -1,0 +1,73 @@
+definitions:
+  services:
+    elasticmq:
+      image: elasticmq:0.14.6
+
+pipelines:
+  branches:
+    staging:
+      - step:
+          name: Code Quality Check
+          image: gradle:4.10.2-jdk8
+          caches:
+            - gradle
+          script:
+            - ./gradlew ktlintCheck
+            - ./gradlew detekt
+      - step:
+          name: Code Compilation
+          image: gradle:4.10.2-jdk8
+          caches:
+            - gradle
+          script:
+            - ./gradlew :app:compileTestKotlin
+            - ./gradlew :integration-test:compileTestKotlin
+      - step:
+          name: Run Unit Tests
+          image: gradle:4.10.2-jdk8
+          caches:
+            - gradle
+          script:
+            - ./gradlew :app:test
+      - step:
+          name: Run Integration Tests
+          image: gradle:4.10.2-jdk8
+          caches:
+            - gradle
+          script:
+            - ./gradlew :app:test
+      - step:
+          name: Check Code Coverage
+          image: gradle:4.10.2-jdk8
+          caches:
+            - gradle
+          script:
+            - ./gradlew jacocoRootTestReport
+            -
+      - step:
+          name: Build fatjar
+          image: gradle:4.10.2-jdk8
+          caches:
+            - gradle
+          script:
+            - ./gradlew :app:shadowJar
+      - step:
+          name: Build Docker Image
+          services:
+            - docker
+          image: docker:latest
+          script:
+            - make release VERSION=${BITBUCKET_COMMIT:0:7}
+      - step:
+          name: Deploy
+          services:
+            - docker
+          image: ubuntu
+          deployment: staging
+          trigger: manual
+          script:
+            - apt-get update && apt-get install -y curl unzip python-pip build-essential
+            - pip install --upgrade setuptools
+            - pip install awscli
+            - curl https://releases.hashicorp.com/terraform/0.11.7/terraform_0.11.7_linux_amd64.zip > /tmp/terraform_0.11.7_linux_amd64.zip && unzip /tmp/terraform_0.11.7_linux_amd64.zip -d /bin
+            - make rollout-staging VERSION=${BITBUCKET_COMMIT:0:7}

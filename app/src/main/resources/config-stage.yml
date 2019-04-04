@@ -1,0 +1,7 @@
+mongoConfig:
+  db_name: test_orders
+  host: mongodb+srv://orders0-mowjm.mongodb.net
+  password: 0e6e2659027c05fb79665be23ca21793a583a65b5d44befbc0d00a4382c05669
+  username: phizzardSuperUser
+sqsConfig:
+  serviceEndpoint: https://sqs.eu-central-1.amazonaws.com/806353235757/incoming-orders

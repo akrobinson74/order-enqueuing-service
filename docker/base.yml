@@ -60,7 +60,7 @@ services:
 #    - docker_order_enqueuing_service
 #    - localmongo
     ports:
-      - "11080:8080"
+      - "9080:8080"
     volumes:
       - ./app/build/openapi.yml:/opt/api.yml
       - ./app/build/config.yml:/opt/config.yml

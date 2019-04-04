@@ -2,9 +2,11 @@ package com.phizzard.es
 
 // Environment variables
 const val HTTP_PORT = "HTTP_PORT"
+const val MONGO_URL = "MONGO_URL"
+const val SQS_URL = "SQS_URL"
 
 // Default values
-const val DEFAULT_HTTP_PORT = 8080
+const val DEFAULT_HTTP_PORT = 9080
 
 const val MONGO_ID = "mongo-id"
 const val ORDERS_COLLECTION_NAME = "orders"

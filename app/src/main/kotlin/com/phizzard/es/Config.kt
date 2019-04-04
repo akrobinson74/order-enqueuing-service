@@ -29,17 +29,20 @@ data class MongoConfig(
 
 val JsonObject.mongoConfig: JsonObject
     get() = getJsonObject("mongoConfig")
+        .overrideConfigValuesWithEnvVars(mapOf("connection_string" to MONGO_URL))
 
 data class SqsConfig(
     val accessKeyId: String = "x",
-    val queueName: String = "order",
+    val queueName: String = "incoming-orders",
     val secretAccessKey: String = "x",
     val serviceEndpoint: String = "http://localhost:9324",
     val signingRegion: String = "elasticmq"
 )
 
 val JsonObject.sqsConfig: SqsConfig
-    get() = SqsConfig()
+    get() = getJsonObject("sqsConfig")
+        .overrideConfigValuesWithEnvVars(mapOf("serviceEndpoint" to SQS_URL))
+        .mapTo(SqsConfig::class.java)
 
 suspend fun obtainConfiguration(vertx: Vertx, configurationPath: String): JsonObject {
     val envStore = configStoreOptionsOf(type = "env")
@@ -51,4 +54,10 @@ suspend fun obtainConfiguration(vertx: Vertx, configurationPath: String): JsonOb
     return ConfigRetriever
         .create(vertx, configRetrieverOptionsOf(stores = listOf(envStore, yamlStore)))
         .getConfigAwait()
+}
+
+fun JsonObject.overrideConfigValuesWithEnvVars(configFieldToEnvVarMap: Map<String, String>): JsonObject {
+    configFieldToEnvVarMap.filter { getString(it.value, "").isNotEmpty() }
+        .map { this.put(it.key, getString(it.value)) }
+    return this
 }

@@ -52,7 +52,7 @@ class BootstrapVerticle : CoroutineVerticle() {
             mountNotImplementedHandler = true
         )
 
-        val mongoClient = MongoClient.createShared(vertx, JsonObject())
+        val mongoClient = MongoClient.createShared(vertx, mongoConfig)
         val sqsClient: AmazonSQS = AmazonSQSClientBuilder.standard()
             .withCredentials(
                 AWSStaticCredentialsProvider(BasicAWSCredentials(sqsConfig.accessKeyId, sqsConfig.secretAccessKey))

@@ -61,7 +61,7 @@ val copyNewRelicAgent by tasks.creating(Copy::class) {
 
 val copyNecessaryFiles by tasks.creating(Copy::class) {
     from("$projectDir/src/main/resources") {
-        include("openapi.yml", "config.yml")
+        include("openapi.yml", "config*.yml")
     }
     into("$rootDir/docker/app/build")
 }

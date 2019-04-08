@@ -21,7 +21,7 @@ services:
       - "9080:8080"
     volumes:
       - ./app/build/openapi.yml:/opt/api.yml
-      - ./app/build/config${ENV:-"-stage"}.yml:/opt/config.yml
+      - ./app/build/"config$${ENV:--stage}.yml":/opt/config.yml
     environment:
     - OPENAPI_PATH=/opt/api.yml
     depends_on:

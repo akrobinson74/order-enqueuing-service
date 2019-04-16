@@ -1,6 +1,10 @@
 # Ignore Gradle project-specific cache directory
 .gradle
 
+# Eclipse non-sense
+.classpath
+.project
+
 # Ignore Gradle build output directory
 build
 
@@ -118,3 +122,4 @@ integration-test/.classpath
 integration-test/.project
 integration-test/.settings/
 integration-test/bin/
+/.classpath

@@ -108,7 +108,6 @@ class BootstrapVerticle : CoroutineVerticle() {
                 }
             token.expire()
         }
-
     }
 
     companion object {

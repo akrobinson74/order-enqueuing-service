@@ -83,6 +83,10 @@ components:
           description: City wherein address is located
           example: Berlin
           type: string
+        country:
+          description: Country where the given address is located
+          example: Germany
+          type: string
         federalState:
           description: State wherein address is located
           example: Berlin
@@ -110,6 +114,7 @@ components:
           type: integer
       required:
         - city
+        - country
         - street
         - streetNumber
         - zipCode
@@ -201,11 +206,16 @@ components:
           example: 2
           format: int32
           type: integer
+        supplierName:
+          description: The manufacturer and/or vendor of this product
+          example: kjus
+          type: string
       required:
         - brandName
         - productDetails
         - productVariantDetails
         - quantity
+        - supplierName
 
     ProductAttribute:
       type: object
@@ -274,7 +284,6 @@ components:
         - currency
         - priceType
         - productVariantAttributes
-        - storeDetails
         - value
 
     StoreDetails:

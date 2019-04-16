@@ -1,5 +1,8 @@
 package com.phizzard.es
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.ObjectWriter
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.vertx.config.ConfigRetriever
 import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
@@ -61,3 +64,7 @@ fun JsonObject.overrideConfigValuesWithEnvVars(configFieldToEnvVarMap: Map<Strin
         .map { this.put(it.key, getString(it.value)) }
     return this
 }
+
+val NULL_QUERY_PROJECTION: JsonObject? = null
+val DEFAULT_MAPPER: ObjectMapper = jacksonObjectMapper()
+val PRETTY_PRINTING_MAPPER: ObjectWriter = DEFAULT_MAPPER.copy().writerWithDefaultPrettyPrinter()

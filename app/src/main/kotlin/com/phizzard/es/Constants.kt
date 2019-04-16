@@ -26,3 +26,6 @@ const val GET_ORDER_OPERATION_ID = "getOrder"
 const val HEALTHCHECK = "healthCheck"
 const val METRICS = "metrics"
 const val OPEN_API_PATH = "/openapi.yaml"
+
+const val ORDER_ID_PATH_PARAM_NAME = "orderId"
+

@@ -2,6 +2,7 @@ package com.phizzard.es.models
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY
+import java.math.BigDecimal
 import java.math.BigInteger
 
 enum class AttributeGroup {
@@ -42,9 +43,10 @@ enum class AttributeName {
 data class Address(
     val id: BigInteger,
     val city: String,
+    val country: String,
     val federalState: String,
-    val latitude: String,
-    val longitude: String,
+    val latitude: BigDecimal? = null,
+    val longitude: BigDecimal? = null,
     val street: String,
     val streetNumber: String,
     val zipCode: String
@@ -61,8 +63,8 @@ data class Contact(
 data class InboundOrder(
     val id: BigInteger,
     val buyerContact: Contact,
-    val deliverContact: Contact,
-    val invoiceContact: Contact,
+    val deliveryContact: Contact? = null,
+    val invoiceContact: Contact? = null,
     val orderItems: List<OrderItem>,
     val status: String,
     val storeDetails: StoreDetails,
@@ -74,7 +76,9 @@ data class OrderItem(
     val brandName: String,
     val productDetails: List<ProductDetails>,
     val productVariantDetails: List<ProductVariantDetails>,
-    val quantity: BigInteger
+    val quantity: BigInteger,
+    val supplierName: String,
+    val value: BigDecimal
 )
 
 data class ProductAttribute(
@@ -93,10 +97,11 @@ data class ProductVariantDetails(
     val priceType: String,
     val productVariantId: BigInteger,
     val productVariantAttributes: List<ProductAttribute>,
-    val storeDetails: StoreDetails
+    val storeDetails: StoreDetails? = null
 )
 
 data class StoreDetails(
+    val id: BigInteger,
     val contactInfo: Contact,
     val name: String,
     val type: String

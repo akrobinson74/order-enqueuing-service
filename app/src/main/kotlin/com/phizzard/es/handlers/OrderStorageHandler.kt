@@ -6,6 +6,7 @@ import com.phizzard.es.models.ErrorBody
 import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.streams.end
+import org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR
 import org.slf4j.LoggerFactory
 
 class OrderStorageHandler(private val mongoClient: MongoClient) {
@@ -27,7 +28,7 @@ class OrderStorageHandler(private val mongoClient: MongoClient) {
                 }
 
                 else -> context.response()
-                    .setStatusCode(500)
+                    .setStatusCode(SC_INTERNAL_SERVER_ERROR)
                     .end { ErrorBody(listOf(result.cause().message ?: "MongoDB Order storage error!")) }
             }
         }

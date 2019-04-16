@@ -7,7 +7,7 @@ import org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR
 
 private const val INVALID_ORDER_OBJECT_MSG = ""
 
-fun handleOpenApiValidationError(routingContext: RoutingContext): Unit =
+fun handleOpenApiValidationError(routingContext: RoutingContext) =
     routingContext.response()
         .setStatusCode(SC_BAD_REQUEST)
         .end(
@@ -18,7 +18,7 @@ fun handleOpenApiValidationError(routingContext: RoutingContext): Unit =
                 .asJsonString(prettyPrint = true)
         )
 
-fun defaultErrorHandler(routingContext: RoutingContext): Unit =
+fun defaultErrorHandler(routingContext: RoutingContext) =
     routingContext.response()
         .setStatusCode(SC_INTERNAL_SERVER_ERROR)
         .end(

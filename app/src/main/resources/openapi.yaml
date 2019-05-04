@@ -87,10 +87,6 @@ components:
           description: Country where the given address is located
           example: Germany
           type: string
-        federalState:
-          description: State wherein address is located
-          example: Berlin
-          type: string
         latitude:
           description: Latitudinal coordinate of the address
           example: 52.431181
@@ -162,6 +158,9 @@ components:
           example: 123467890
           format: int64
           type: integer
+        approvalCode:
+          type: string
+          example: "I really approve of you"
         buyerContact:
           $ref: '#/components/schemas/Contact'
         deliveryContact:
@@ -172,21 +171,27 @@ components:
           items:
             $ref: '#/components/schemas/OrderItem'
           type: array
+        receiverGln:
+          type: string
+          example: "9012345000004"
+        senderGln:
+          type: string
+          example: "9012345000001"
         status:
           type: string
           enum: [PROCESSING, CANCELED, COMPLETED]
         storeDetails:
           $ref: '#/components/schemas/StoreDetails'
-        uuid:
-          description: An arbitrary identification string...
-          example: AF504EC2-4005-11E9-B16F-2436AB45578C
+        transactionDate:
           type: string
+          format: ISO Date
+          example: "2019-05-02T08:05:23.653Z"
       required:
         - buyerContact
         - orderItems
         - status
         - storeDetails
-          
+
     OrderItem:
       type: object
       properties:
@@ -197,6 +202,10 @@ components:
           type: integer
         brandName:
           description: Brand name of the product purchased
+        gtin:
+          description: A unique identifier for this product
+          type: string
+          example: "801234567009"
         productDetails:
           $ref: '#/components/schemas/ProductDetails'
         productVariantDetails:
@@ -207,7 +216,7 @@ components:
           format: int32
           type: integer
         supplierName:
-          description: The manufacturer and/or vendor of this product
+          description: The manufacturer and/or vendor of this product; used to split and group orderItems together
           example: kjus
           type: string
       required:
@@ -307,7 +316,3 @@ components:
       required:
         - name
         - type
-# Added by API Auto Mocking Plugin
-servers:
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/phizzard/order-enqueuing_service_open_api_spec/1.0.0

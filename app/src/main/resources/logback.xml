@@ -4,14 +4,6 @@
         <encoder>
             <pattern>[%d{YYYY-MM-dd HH:mm:ss.SSS}] [%thread] [%-5level] %logger{36} - %msg%n</pattern>
         </encoder>
-<!--        <encoder class="net.logstash.logback.encoder.LogstashEncoder">-->
-<!--            <fieldNames class="net.logstash.logback.fieldnames.ShortenedFieldNames">-->
-<!--                <timestamp>timestamp</timestamp>-->
-<!--                <levelValue>[ignore]</levelValue>-->
-<!--                <version>[ignore]</version>-->
-<!--            </fieldNames>-->
-<!--            <timestampPattern>[UNIX_TIMESTAMP_AS_NUMBER]</timestampPattern>-->
-<!--        </encoder>-->
     </appender>
 
     <appender name="LOG" class="ch.qos.logback.core.FileAppender">
@@ -22,23 +14,16 @@
         <encoder>
             <pattern>[%d{YYYY-MM-dd HH:mm:ss.SSS}] [%thread] [%-5level] %logger{36} - %msg%n</pattern>
         </encoder>
-<!--        <encoder class="net.logstash.logback.encoder.LogstashEncoder">-->
-<!--            <fieldNames class="net.logstash.logback.fieldnames.ShortenedFieldNames">-->
-<!--                <timestamp>timestamp</timestamp>-->
-<!--                <levelValue>[ignore]</levelValue>-->
-<!--                <version>[ignore]</version>-->
-<!--            </fieldNames>-->
-<!--            <timestampPattern>[UNIX_TIMESTAMP_AS_NUMBER]</timestampPattern>-->
-<!--        </encoder>-->
     </appender>
+
+    <logger name="org.mongodb.driver.cluster" level="WARNING">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="LOG" />
+    </logger>
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="LOG" />
     </root>
-    <logger name="org.mongodb.driver.cluster" level="WARNING">
-        <appender-ref ref="STDOUT"/>
-        <appender-ref ref="LOG" />
-    </logger>
 
 </configuration>

@@ -61,7 +61,17 @@ val copyNewRelicAgent by tasks.creating(Copy::class) {
 
 val copyNecessaryFiles by tasks.creating(Copy::class) {
     from("$projectDir/src/main/resources") {
-        include("openapi.yml", "config*.yml")
+        include("openapi.yml", "config*.yml", "logback.xml")
+    }
+    into("$rootDir/docker/app/build")
+}
+
+val renameProdConfig by tasks.creating(Copy::class) {
+    from("$projectDir/src/main/resources") {
+        include("config-prod.yml")
+    }
+    rename { fileName ->
+        fileName.replace("-prod","")
     }
     into("$rootDir/docker/app/build")
 }
@@ -76,5 +86,6 @@ tasks {
 
         dependsOn.add(copyNewRelicAgent)
         dependsOn.add(copyNecessaryFiles)
+        dependsOn.add(renameProdConfig)
     }
 }

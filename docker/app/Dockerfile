@@ -7,6 +7,7 @@ LABEL io.k8s.description="Platform for Java (fatjar) runtime" \
 WORKDIR /deployments
 
 # Application
+COPY build/config-prod.yml /opt/config.yml
 COPY build/order-enqueuing-service.jar .
 # NewRelic java agent
 COPY build/newrelic.jar /opt/newrelic/newrelic.jar

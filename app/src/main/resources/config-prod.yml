@@ -1,8 +1,8 @@
-elasticSearch:
-  domainARN: arn:aws:es:eu-west-1:806353235757:domain/search
-  endpoint: https://search-search-hpxggu3ndtubx7szxue4pcxb7a.eu-west-1.es.amazonaws.com
-  kibana: https://search-search-hpxggu3ndtubx7szxue4pcxb7a.eu-west-1.es.amazonaws.com/_plugin/kibana/
-  version: 6.3
 mongoConfig:
-  connection_string: mongodb://127.0.0.1:27017
+  connection_string: mongodb+srv://phizzardSuperUser:0e6e2659027c05fb79665be23ca21793a583a65b5d44befbc0d00a4382c05669@orders0-mowjm.mongodb.net/orders?ssl=true&sslInvalidHostNameAllowed=true&streamType=netty
 sqsConfig:
+  accessKeyId: AKIAJ3KDNXMVJAWHXBRA
+  queueName: test-orders
+  serviceEndpoint: https://sqs.eu-central-1.amazonaws.com/806353235757/incoming-orders
+  secretAccessKey: 3dYqPjZJfWyhJwDylaf1gsGvr6kfx6n08E1tl1yQ
+  signingRegion: eu-central-1

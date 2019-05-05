@@ -32,8 +32,13 @@
 <!--        </encoder>-->
     </appender>
 
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="LOG" />
     </root>
+    <logger name="org.mongodb.driver.cluster" level="WARNING">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="LOG" />
+    </logger>
+
 </configuration>

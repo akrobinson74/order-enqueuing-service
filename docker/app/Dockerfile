@@ -14,4 +14,4 @@ COPY build/newrelic.yml /opt/newrelic/newrelic.yml
 
 EXPOSE 9080
 
-CMD ["java", "-Dcom.sun.enterprise.security.httpsOutboundKeyAlias=s1as", "-jar", "order-enqueuing-service.jar", "/opt/config.yml"]
+CMD ["java", "-jar", "order-enqueuing-service.jar", "/opt/config.yml"]

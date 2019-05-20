@@ -1,3 +1,25 @@
+cors:
+  allowedHeaders:
+    - Authorization
+    - Cache-Control
+    - Content-Length
+    - Content-Range
+    - DNT
+    - If-Modified-Since
+    - User-Agent
+    - X-Requested-With
+  allowedMethods:
+    - CONNECT
+    - DELETE
+    - GET
+    - HEAD
+    - OPTIONS
+    - OTHER
+    - PATCH
+    - POST
+    - PUT
+    - TRACE
+  allowedOriginPattern: "*"
 mongoConfig:
   connection_string: mongodb+srv://phizzardTestDBUser:b55dd2655323fcbcb9df06c55af4bc51676964d2c294e0ac8628e1ac9d99060d@orders0-mowjm.mongodb.net/test_orders?ssl=true&sslInvalidHostNameAllowed=true&streamType=netty
 sqsConfig:

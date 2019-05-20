@@ -1,6 +1,13 @@
 cors:
   allowedHeaders:
     - Authorization
+    - Cache-Control
+    - Content-Length
+    - Content-Range
+    - DNT
+    - If-Modified-Since
+    - User-Agent
+    - X-Requested-With
   allowedMethods:
     - CONNECT
     - DELETE

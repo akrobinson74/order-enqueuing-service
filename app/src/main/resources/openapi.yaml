@@ -1,13 +1,13 @@
 openapi: 3.0.0
 info:
-  description: "Enumeration of the endpoints the OrderProcessingService exposes and the expected data transfer objects"
-  title: "OrderProcessingService OpenAPI Spec"
-  version: "1.0.0"
+  description: "Enumeration of the endpoints the OrderEnqueuingService exposes and the expected data transfer objects"
+  title: "OrderEnqueuingService OpenAPI Spec"
+  version: "1.0.2"
 paths:
   /order:
     post:
       summary: "Create a new Order resource to be enqued for processing"
-      operationId: postTestOrder
+      operationId: createOrder
       requestBody:
         required: true
         content:
@@ -34,6 +34,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorBody'
+  /order/{orderId}:
+    get:
+      summary: "Obtain an Order resource possesses the same orderId in the path parameter"
+      operationId: getOrder
+      parameters:
+      - in: path
+        name: orderId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK.  Return the corresponding Order resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: NOT_FOUND.  No Order resource corresponds to ${orderId}
   /health:
     get:
       summary: Health Check endpoint

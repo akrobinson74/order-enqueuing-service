@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.time.ZonedDateTime
 
 enum class AttributeGroup {
     APPEARANCE, DIMENSIONS, FLAGS, MISCELLANEOUS;
@@ -62,49 +63,30 @@ data class Contact(
 
 data class InboundOrder(
     val id: BigInteger,
+    val approvalCode: String,
     val buyerContact: Contact,
     val deliveryContact: Contact? = null,
     val invoiceContact: Contact? = null,
+    val customerDelivery: Boolean = true,
     val orderItems: List<OrderItem>,
     val status: String,
-    val storeDetails: StoreDetails,
-    val uuid: String
+    val transactionDate: ZonedDateTime = ZonedDateTime.now()
 )
 
 data class OrderItem(
-    val id: BigInteger,
-    val brandName: String,
-    val productDetails: List<ProductDetails>,
-    val productVariantDetails: List<ProductVariantDetails>,
-    val quantity: BigInteger,
-    val supplierName: String,
-    val value: BigDecimal
-)
-
-data class ProductAttribute(
-    val group: String,
-    val name: String,
-    val value: String
-)
-
-data class ProductDetails(
-    val id: BigInteger,
-    val productAttributes: List<ProductAttribute>
-)
-
-data class ProductVariantDetails(
+    val articleDescription: String,
     val currency: String,
-    val priceType: String,
-    val productVariantId: BigInteger,
-    val productVariantAttributes: List<ProductAttribute>,
-    val storeDetails: StoreDetails? = null
+    val grossPrice: Double,
+    val gtin: String,
+    val netPrice: Double? = null,
+    val quantity: BigInteger,
+    val shop: Shop? = null,
+    val supplierName: String
 )
 
-data class StoreDetails(
-    val id: BigInteger,
-    val contactInfo: Contact,
-    val name: String,
-    val type: String
+data class Shop(
+    val identifier: String,
+    val name: String
 )
 
 data class ErrorBody(

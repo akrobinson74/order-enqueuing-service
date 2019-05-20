@@ -1,13 +1,13 @@
 openapi: 3.0.0
 info:
-  description: "Enumeration of the endpoints the OrderEnqueuingService exposes and the expected data transfer objects"
-  title: "OrderEnqueuingService OpenAPI Spec"
-  version: "1.0.2"
+  description: "Enumeration of the endpoints the OrderProcessingService exposes and the expected data transfer objects"
+  title: "OrderProcessingService OpenAPI Spec"
+  version: "1.0.0"
 paths:
-  /create:
+  /order:
     post:
       summary: "Create a new Order resource to be enqued for processing"
-      operationId: createOrder
+      operationId: postTestOrder
       requestBody:
         required: true
         content:
@@ -34,25 +34,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorBody'
-  /order/{orderId}:
-    get:
-      summary: "Obtain an Order resource possesses the same orderId in the path parameter"
-      operationId: getOrder
-      parameters:
-      - in: path
-        name: orderId
-        required: true
-        schema:
-          type: string
-      responses:
-        '200':
-          description: OK.  Return the corresponding Order resource
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
-        '404':
-          description: NOT_FOUND.  No Order resource corresponds to ${orderId}
   /health:
     get:
       summary: Health Check endpoint
@@ -171,17 +152,9 @@ components:
           items:
             $ref: '#/components/schemas/OrderItem'
           type: array
-        receiverGln:
-          type: string
-          example: "9012345000004"
-        senderGln:
-          type: string
-          example: "9012345000001"
         status:
           type: string
           enum: [PROCESSING, CANCELED, COMPLETED]
-        storeDetails:
-          $ref: '#/components/schemas/StoreDetails'
         transactionDate:
           type: string
           format: ISO Date
@@ -190,129 +163,57 @@ components:
         - buyerContact
         - orderItems
         - status
-        - storeDetails
 
     OrderItem:
       type: object
       properties:
-        id:
-          description: Database id of the orderItem
-          example: 123467890
-          format: int64
-          type: integer
-        brandName:
-          description: Brand name of the product purchased
+        articleDescription:
+          description: Description of the article in question
+          example: "Ladies Kjus T-shirt"
+          type: string
+        currency:
+          description: ISO currency code for currency used in the purchase of this item
+          example: "CHF"
+          type: string
+        grossPrice:
+          example: 64.07
+          type: number
+          format: double
         gtin:
           description: A unique identifier for this product
           type: string
-          example: "801234567009"
-        productDetails:
-          $ref: '#/components/schemas/ProductDetails'
-        productVariantDetails:
-          $ref: '#/components/schemas/ProductVariantDetails'
+          example: "07612997688944"
+        netPrice:
+          example: 69.0
+          type: number
+          format: double
         quantity:
           description: The amount of the particular productVariant ordered
           example: 2
           format: int32
           type: integer
+        shop:
+          $ref: '#/components/schemas/Shop'
         supplierName:
           description: The manufacturer and/or vendor of this product; used to split and group orderItems together
           example: kjus
           type: string
       required:
-        - brandName
-        - productDetails
-        - productVariantDetails
+        - articleDescription
+        - currency
+        - gtin
+        - grossPrice
         - quantity
         - supplierName
 
-    ProductAttribute:
+    Shop:
       type: object
       properties:
-        group:
-          description: An attribute applicable to products
-          enum: [APPEARANCE, DIMENSIONS, FLAGS, MISCELLANEOUS]
-          example: DIMENSIONS
+        identifier:
+          description: text to identify the shop that was the source of the item value can be GLN, number or an address - the value becomes a string literal
+          example: "200742"
           type: string
         name:
-          description: The name of the product attribute in question
-          enum: [ARM_LENGTH,CALF_HEIGHT,CALF_WIDTH,COLLAR,COLOR,COMFORT_WIDTH,CUT,DESIGN,HEEL,INNER_MATERIAL,IS_NEW,IS_PROMO,MATERIAL,ON_SALE,PRODUCT_CATEGORY,PRODUCT_LINE,REPLACEABLE_FOOTBED,SEASON,SEX,SHAPE,SIGNATURE,SIZE,SIZE_RANGE,SOLE_MATERIAL,TOECAP,TRANSLATION_KEY,WATERPROOF,WIDTH]
-          example: COLOR
+          description: the name of the shop from which the item is sourced
+          example: "Pais"
           type: string
-        value:
-          description: The particular value associated with the product attribute
-          example: peuce
-          type: string
-      required:
-        - group
-        - name
-        - value
-
-    ProductDetails:
-      type: object
-      properties:
-        id:
-          description: Database id of the store
-          example: 123467890
-          format: int64
-          type: integer
-        productAttributes:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductAttribute'
-      required:
-        - productAttributes
-
-    ProductVariantDetails:
-      type: object
-      properties:
-        currency:
-          description: Currency associated with the Product at the particular store location
-          example: EUR
-          type: string
-        priceType:
-          description: the price category with which this project is assocaited
-          example: sale
-          type: string
-        productVariantId:
-          description: Database id of the productVariant
-          example: 123467890
-          format: int64
-          type: integer
-        productVariantAttributes:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductAttribute'
-        storeDetails:
-          $ref: '#/components/schemas/StoreDetails'
-        value:
-          description: Price of the product at the given store
-          example: 19.95
-          type: number
-      required:
-        - currency
-        - priceType
-        - productVariantAttributes
-        - value
-
-    StoreDetails:
-      type: object
-      properties:
-        contactInfo:
-          $ref: '#/components/schemas/Contact'
-        id:
-          description: Database id of the store
-          example: 123467890
-          format: int64
-          type: integer
-        name:
-          description: name of the store associated with the Order
-          example: FootLocker
-          type: string
-        type:
-          description: category of the store associated with the Order
-          example: Sporting Goods
-          type: string
-      required:
-        - name
-        - type

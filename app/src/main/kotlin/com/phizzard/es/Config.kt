@@ -5,11 +5,21 @@ import com.fasterxml.jackson.databind.ObjectWriter
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.vertx.config.ConfigRetriever
 import io.vertx.core.Vertx
+import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.JsonObject
 import io.vertx.kotlin.config.configRetrieverOptionsOf
 import io.vertx.kotlin.config.configStoreOptionsOf
 import io.vertx.kotlin.config.getConfigAwait
 import io.vertx.kotlin.core.json.JsonObject
+
+data class CorsConfig(
+    val allowedHeaders: Set<String>,
+    val allowedMethods: Set<HttpMethod>,
+    val allowedOriginPattern: String
+)
+
+val JsonObject.corsConfig: CorsConfig
+    get() = getJsonObject("cors").mapTo(CorsConfig::class.java)
 
 data class ElasticsearchConfig(
     val domainARN: String,

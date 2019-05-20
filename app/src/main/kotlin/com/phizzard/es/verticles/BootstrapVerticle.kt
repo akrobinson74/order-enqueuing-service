@@ -9,12 +9,14 @@ import com.amazonaws.services.sqs.AmazonSQSClientBuilder
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.newrelic.api.agent.NewRelic
 import com.phizzard.es.CREATE_ORDER_OPERATION_ID
+import com.phizzard.es.CorsConfig
 import com.phizzard.es.DEFAULT_HTTP_PORT
 import com.phizzard.es.GET_ORDER_OPERATION_ID
 import com.phizzard.es.HTTP_PORT
 import com.phizzard.es.METRICS
 import com.phizzard.es.OPEN_API_PATH
 import com.phizzard.es.SqsConfig
+import com.phizzard.es.corsConfig
 import com.phizzard.es.handlers.MessageEnqueuingHandler
 import com.phizzard.es.handlers.OrderRetrievalHandler
 import com.phizzard.es.handlers.OrderStorageHandler
@@ -30,6 +32,7 @@ import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.api.contract.openapi3.OpenAPI3RouterFactory
 import io.vertx.ext.web.handler.BodyHandler
+import io.vertx.ext.web.handler.CorsHandler
 import io.vertx.kotlin.core.http.listenAwait
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.ext.web.api.contract.openapi3.OpenAPI3RouterFactory.createAwait
@@ -39,6 +42,7 @@ import org.slf4j.LoggerFactory
 
 class BootstrapVerticle : CoroutineVerticle() {
 
+    private val corsConfig: CorsConfig by lazy { config.corsConfig }
     private val mongoConfig: JsonObject by lazy { config.mongoConfig }
     private val sqsConfig: SqsConfig by lazy { config.sqsConfig }
 
@@ -81,6 +85,10 @@ class BootstrapVerticle : CoroutineVerticle() {
                 operationId = GET_ORDER_OPERATION_ID
             )
             .setValidationFailureHandler(::handleOpenApiValidationError)
+            .addGlobalHandler(CorsHandler.create(corsConfig.allowedOriginPattern)
+                .allowedHeaders(corsConfig.allowedHeaders)
+                .allowedMethods(corsConfig.allowedMethods)
+            )
             .setBodyHandler(BodyHandler.create(false))
             .setOptions(routerOptions)
             .router

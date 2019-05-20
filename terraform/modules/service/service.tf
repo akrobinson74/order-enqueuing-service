@@ -68,8 +68,8 @@ data "template_file" "service" {
       "name": "order-processing-service",
       "image": "${var.docker_registry_host}/${var.docker_registry_key}:$${version}",
       "essential": true,
-      "memoryReservation": 480,
-      "cpu": 500,
+      "memoryReservation": 512,
+      "cpu": 512,
       "environment": [
         {
           "name": "APP_ENV",
@@ -137,7 +137,7 @@ EOT
 }
 
 resource "aws_ecs_task_definition" "service" {
-  family                = "phizzardapi_${var.env}"
+  family                = "order-enqueuing-service-staging"
   container_definitions = "${data.template_file.service.rendered}"
 }
 

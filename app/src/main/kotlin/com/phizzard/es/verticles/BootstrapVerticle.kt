@@ -8,10 +8,12 @@ import com.amazonaws.services.sqs.AmazonSQS
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.newrelic.api.agent.NewRelic
+import com.phizzard.es.BOOTSTRAP_HEALTH
 import com.phizzard.es.CREATE_ORDER_OPERATION_ID
 import com.phizzard.es.CorsConfig
 import com.phizzard.es.DEFAULT_HTTP_PORT
 import com.phizzard.es.GET_ORDER_OPERATION_ID
+import com.phizzard.es.HEALTH_CHECK
 import com.phizzard.es.HTTP_PORT
 import com.phizzard.es.METRICS
 import com.phizzard.es.OPEN_API_PATH
@@ -20,6 +22,7 @@ import com.phizzard.es.corsConfig
 import com.phizzard.es.handlers.MessageEnqueuingHandler
 import com.phizzard.es.handlers.OrderRetrievalHandler
 import com.phizzard.es.handlers.OrderStorageHandler
+import com.phizzard.es.handlers.buildHealthCheck
 import com.phizzard.es.handlers.defaultErrorHandler
 import com.phizzard.es.handlers.handleOpenApiValidationError
 import com.phizzard.es.mongoConfig
@@ -49,6 +52,8 @@ class BootstrapVerticle : CoroutineVerticle() {
     override suspend fun start() {
         logger.info("Starting BootstrapVerticle")
 
+        vertx.eventBus().consumer<Int>(BOOTSTRAP_HEALTH) { it.reply(0) }
+
         registerJacksonModules()
 
         val routerOptions = routerFactoryOptionsOf(
@@ -68,6 +73,7 @@ class BootstrapVerticle : CoroutineVerticle() {
 
         val router = createAwait(vertx, OPEN_API_PATH)
             .addFailureHandlerByOperationId(CREATE_ORDER_OPERATION_ID, ::defaultErrorHandler)
+            .addHandlerByOperationId(HEALTH_CHECK, buildHealthCheck(vertx))
             .addHandlerByOperationId(METRICS, ::prometheusHandler)
             .addSuspendingHandlerByOperationId(
                 handler = OrderStorageHandler(mongoClient)::handle,

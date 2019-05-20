@@ -2,8 +2,16 @@ cors:
   allowedHeaders:
     - Authorization
   allowedMethods:
+    - CONNECT
+    - DELETE
     - GET
+    - HEAD
+    - OPTIONS
+    - OTHER
+    - PATCH
     - POST
+    - PUT
+    - TRACE
   allowedOriginPattern: "*"
 mongoConfig:
   connection_string: mongodb+srv://phizzardSuperUser:0e6e2659027c05fb79665be23ca21793a583a65b5d44befbc0d00a4382c05669@orders0-mowjm.mongodb.net/orders?ssl=true&sslInvalidHostNameAllowed=true&streamType=netty

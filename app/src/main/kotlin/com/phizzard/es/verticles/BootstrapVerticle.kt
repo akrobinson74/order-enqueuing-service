@@ -36,6 +36,8 @@ import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.api.contract.openapi3.OpenAPI3RouterFactory
 import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.ext.web.handler.CorsHandler
+import io.vertx.ext.web.handler.LoggerFormat
+import io.vertx.ext.web.handler.LoggerHandler
 import io.vertx.kotlin.core.http.listenAwait
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.ext.web.api.contract.openapi3.OpenAPI3RouterFactory.createAwait
@@ -95,6 +97,7 @@ class BootstrapVerticle : CoroutineVerticle() {
                 .allowedHeaders(corsConfig.allowedHeaders)
                 .allowedMethods(corsConfig.allowedMethods)
             )
+            .addGlobalHandler(LoggerHandler.create(true, LoggerFormat.DEFAULT))
             .setBodyHandler(BodyHandler.create(false))
             .setOptions(routerOptions)
             .router

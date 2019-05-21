@@ -46,14 +46,14 @@ const val SAMPLE_ORDER = """
       "grossPrice": 64.07,
       "netPrice": 69.0,
       "quantity": 1,
-      "shop": {
-        "name": "Pais",
-        "identifier": "200742"
-      },
       "supplierName": "kjus"
     }
   ],
-  "status": "PROCESSING"
+  "status": "PROCESSING",
+  "store": {
+    "name": "Pais",
+    "storeId": "200742"
+  }
 }
 """
 

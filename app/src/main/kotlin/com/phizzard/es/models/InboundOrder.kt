@@ -70,6 +70,7 @@ data class InboundOrder(
     val customerDelivery: Boolean = true,
     val orderItems: List<OrderItem>,
     val status: String,
+    val store: StoreDetails,
     val transactionDate: ZonedDateTime = ZonedDateTime.now()
 )
 
@@ -80,12 +81,13 @@ data class OrderItem(
     val gtin: String,
     val netPrice: Double? = null,
     val quantity: BigInteger,
-    val shop: Shop? = null,
     val supplierName: String
 )
 
-data class Shop(
-    val identifier: String,
+data class StoreDetails(
+    val contactInfo: Contact? = null,
+    val gln: String? = null,
+    val storeId: String? = null,
     val name: String
 )
 

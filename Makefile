@@ -18,6 +18,13 @@ build-local:
 build-local-and-run: build-local
 	docker run -d --name oes_latest_local -p 9080:9080 latest_local
 
+compose.deps.down:
+	$(service-up-compose) down
+
+compose.deps.up: build
+	$(service-up-compose) build
+	$(service-up-compose) up elasticmq mongo1
+
 compose.service.up: build
 	$(service-up-compose) build
 	$(service-up-compose) up -d

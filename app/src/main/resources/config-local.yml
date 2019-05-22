@@ -21,10 +21,10 @@ cors:
     - TRACE
   allowedOriginPattern: "*"
 mongoConfig:
-  connection_string: mongodb+srv://phizzardTestDBUser:b55dd2655323fcbcb9df06c55af4bc51676964d2c294e0ac8628e1ac9d99060d@orders0-mowjm.mongodb.net/test_orders?ssl=true&sslInvalidHostNameAllowed=true&streamType=netty
+  connection_string: mongodb://127.0.0.1/test_orders?streamType=netty
 sqsConfig:
-  accessKeyId: AKIAJ3KDNXMVJAWHXBRA
+  accessKeyId: x
   queueName: test-orders
-  serviceEndpoint: https://sqs.eu-central-1.amazonaws.com/806353235757/test-orders
-  secretAccessKey: 3dYqPjZJfWyhJwDylaf1gsGvr6kfx6n08E1tl1yQ
-  signingRegion: eu-central-1
+  serviceEndpoint: http://localhost:9324
+  secretAccessKey: x
+  signingRegion: elasticmq

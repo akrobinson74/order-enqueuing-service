@@ -1,0 +1,29 @@
+version: '3.7'
+
+services:
+  elasticmq:
+    build: elasticmq
+    container_name: order_queue
+    ports:
+      - "9324:9324"
+  mongo1:
+    hostname: mongo1
+    container_name: localmongo1
+    image: mongo:3.6-jessie
+    ports:
+      - "27017:27017"
+    restart: always
+  order-enqueuing-service:
+    build: app
+    container_name: order-enqueuing-service
+    image: order-enqueuing-service
+    ports:
+      - "9080:8080"
+    volumes:
+      - ./app/build/openapi.yml:/opt/api.yml
+      - ./app/build/"config$${ENV:--stage}.yml":/opt/config.yml
+    environment:
+    - OPENAPI_PATH=/opt/api.yml
+    depends_on:
+      - elasticmq
+      - mongo1

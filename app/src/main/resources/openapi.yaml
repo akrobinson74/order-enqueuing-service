@@ -74,11 +74,6 @@ components:
     Address:
       type: object
       properties:
-        id:
-          description: Database id of the address
-          example: 123467890
-          format: int64
-          type: integer
         city:
           description: City wherein address is located
           example: Berlin
@@ -106,8 +101,7 @@ components:
         zipCode:
           description: Postal code of the address
           example: 12489
-          format: int32
-          type: integer
+          type: string
       required:
         - city
         - country
@@ -135,12 +129,6 @@ components:
           description: Phone number at which to reach the contact
           example: '+49123456789910'
           type: string
-      required:
-        - address
-        - email
-        - firstName
-        - lastName
-        - phoneNumber
 
     ErrorBody:
       type: object
@@ -181,7 +169,6 @@ components:
           format: ISO Date
           example: "2019-05-02T08:05:23.653Z"
       required:
-        - buyerContact
         - orderItems
         - status
         - store
@@ -226,11 +213,35 @@ components:
         - quantity
         - supplierName
 
+    StoreContact:
+      type: object
+      properties:
+        address:
+          $ref: '#/components/schemas/Address'
+        email:
+          description: Email address of the contact
+          example: michael.mente@phizzard.com
+        firstName:
+          description: First name of the contact
+          example: Michael
+          type: string
+        lastName:
+          description: Last name of the contact
+          example: Mente
+          type: string
+        phoneNumber:
+          description: Phone number at which to reach the contact
+          example: '+49123456789910'
+          type: string
+      required:
+        - address
+        - phoneNumber
+
     StoreDetails:
       type: object
       properties:
         contactInfo:
-          $ref: '#/components/schemas/Contact'
+          $ref: '#/components/schemas/StoreContact'
         gln:
           description: GLN that identifies the store
           example: "4399902214995"

@@ -1,7 +1,5 @@
 definitions:
   services:
-    docker:
-      image: docker:latest
 #    elasticmq:
 #      image: elasticmq:0.14.6
     gradle:
@@ -14,38 +12,40 @@ definitions:
 pipelines:
   branches:
     stage:
-      - step:
-          name: Code Quality Check
-          services:
-            - gradle
-          script:
-            - ./gradlew ktlintCheck
-            - ./gradlew detekt
-      - step:
-          name: Code Compilation
-          services:
-            - gradle
-          caches:
-            - gradle
-          script:
-            - ./gradlew :app:compileTestKotlin
-            - ./gradlew :integration-test:compileTestKotlin
-      - step:
-          name: Run Unit Tests
-          services:
-            - gradle
-          caches:
-            - gradle
-          script:
-            - ./gradlew :app:test
-      - step:
-          name: Run Integration Tests
-          services:
-            - gradle
-          caches:
-            - gradle
-          script:
-            - ./gradlew :app:test
+      - parallel:
+        - step:
+            name: Code Quality Check
+            services:
+              - gradle
+            script:
+              - ./gradlew ktlintCheck
+              - ./gradlew detekt
+        - step:
+            name: Code Compilation
+            services:
+              - gradle
+            caches:
+              - gradle
+            script:
+              - ./gradlew :app:compileTestKotlin
+              - ./gradlew :integration-test:compileTestKotlin
+      - parallel:
+        - step:
+            name: Run Unit Tests
+            services:
+              - gradle
+            caches:
+              - gradle
+            script:
+              - ./gradlew :app:test
+        - step:
+            name: Run Integration Tests
+            services:
+              - gradle
+            caches:
+              - gradle
+            script:
+              - ./gradlew :integration-test:test
       - step:
           name: Check Code Coverage
           services:
@@ -69,7 +69,6 @@ pipelines:
           services:
             - docker
             - ubuntu
-          image: docker:latest
           script:
             - export APP_ENV=stage
             - apt-get -y update && apt-get -y install build-essential curl gnupg python-pip sudo

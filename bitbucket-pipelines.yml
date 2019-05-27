@@ -58,6 +58,10 @@ pipelines:
             - docker
           image: docker:latest
           script:
+            - export APP_ENV=stage
+            - apt-get -y update && apt-get -y install build-essential curl gnupg python-pip sudo
+            - pip install --upgrade setuptools
+            - pip install awscli
             - make release VERSION=${BITBUCKET_COMMIT:0:7}
       - step:
           name: Deploy
@@ -67,6 +71,7 @@ pipelines:
           deployment: staging
           trigger: manual
           script:
+            - export APP_ENV=stage
             - apt-get update && apt-get install -y curl unzip python-pip build-essential
             - pip install --upgrade setuptools
             - pip install awscli

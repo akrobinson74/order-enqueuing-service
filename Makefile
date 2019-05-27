@@ -1,6 +1,6 @@
-# SERVICE_NAME = $(basename $PWD)
-# DOCKERREPO := $(shell aws ecr --region eu-central-1 describe-repositories --repository-names $(SERVICE_NAME) --max-items 1 --query 'repositories[0].repositoryUri' --output text)
-# VERSION ?= $(shell git describe --tags --always --abbrev=7 --dirty=-dirty-$(USER)-$(shell date -u +"%Y%m%dT%H%M%SZ"))
+SERVICE_NAME = $(basename $PWD)
+DOCKERREPO := $(shell aws ecr --region eu-central-1 describe-repositories --repository-names $(SERVICE_NAME) --max-items 1 --query 'repositories[0].repositoryUri' --output text)
+VERSION ?= $(shell git describe --tags --always --abbrev=7 --dirty=-dirty-$(USER)-$(shell date -u +"%Y%m%dT%H%M%SZ"))
 service-up-compose = docker-compose -f docker/base.yml
 
 clean:

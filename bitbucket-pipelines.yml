@@ -53,6 +53,8 @@ pipelines:
             - ./gradlew :app:shadowJar
       - step:
           name: Build Docker Image
+          caches:
+            - gradle
           services:
             - docker
           image: docker:latest

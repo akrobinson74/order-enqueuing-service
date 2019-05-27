@@ -21,8 +21,8 @@ fun buildMetricsOptions(): MicrometerMetricsOptions {
     if (!System.getenv(NR_INSIGHTS_KEY).isNullOrEmpty()) {
         registries += NewRelicMeterRegistry(
             object : NewRelicConfig {
-                override fun accountId(): String = System.getenv(NR_ACCOUNT_ID)
-                override fun apiKey(): String = System.getenv(NR_INSIGHTS_KEY)
+                override fun accountId(): String { val accountId = System.getenv(NR_ACCOUNT_ID); System.out.println(accountId); return accountId }
+                override fun apiKey(): String { val apiKey = System.getenv(NR_INSIGHTS_KEY); System.out.println(apiKey); return apiKey }
                 override fun get(key: String): String? = null
             }, io.micrometer.core.instrument.Clock.SYSTEM
         ).also { it.config().commonTags("appName", System.getenv(NEW_RELIC_APP_NAME)) }

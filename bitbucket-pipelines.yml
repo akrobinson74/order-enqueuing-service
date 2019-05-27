@@ -1,22 +1,30 @@
 definitions:
   services:
-    elasticmq:
-      image: elasticmq:0.14.6
+    docker:
+      image: docker:latest
+#    elasticmq:
+#      image: elasticmq:0.14.6
+    gradle:
+      image: gradle:4.10.2-jdk8
+#    mongo:
+#      image: mongo:4.0.9
+    ubuntu:
+      image: ubuntu:18.04
 
 pipelines:
   branches:
     stage:
       - step:
           name: Code Quality Check
-          image: gradle:4.10.2-jdk8
-          caches:
+          services:
             - gradle
           script:
             - ./gradlew ktlintCheck
             - ./gradlew detekt
       - step:
           name: Code Compilation
-          image: gradle:4.10.2-jdk8
+          services:
+            - gradle
           caches:
             - gradle
           script:
@@ -24,28 +32,32 @@ pipelines:
             - ./gradlew :integration-test:compileTestKotlin
       - step:
           name: Run Unit Tests
-          image: gradle:4.10.2-jdk8
+          services:
+            - gradle
           caches:
             - gradle
           script:
             - ./gradlew :app:test
       - step:
           name: Run Integration Tests
-          image: gradle:4.10.2-jdk8
+          services:
+            - gradle
           caches:
             - gradle
           script:
             - ./gradlew :app:test
       - step:
           name: Check Code Coverage
-          image: gradle:4.10.2-jdk8
+          services:
+            - gradle
           caches:
             - gradle
           script:
             - ./gradlew jacocoRootTestReport
       - step:
           name: Build fatjar
-          image: gradle:4.10.2-jdk8
+          services:
+            - gradle
           caches:
             - gradle
           script:
@@ -56,6 +68,7 @@ pipelines:
             - gradle
           services:
             - docker
+            - ubuntu
           image: docker:latest
           script:
             - export APP_ENV=stage
@@ -67,7 +80,7 @@ pipelines:
           name: Deploy
           services:
             - docker
-          image: ubuntu
+            - ubuntu
           deployment: staging
           trigger: manual
           script:

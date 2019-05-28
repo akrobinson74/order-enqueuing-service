@@ -62,6 +62,8 @@ pipelines:
             - gradle
           script:
             - ./gradlew :app:shadowJar
+          artifacts:
+            - docker/app/build/**
       - step:
           name: Build Docker Image
           caches:

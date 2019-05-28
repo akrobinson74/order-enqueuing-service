@@ -16,12 +16,12 @@
         </encoder>
     </appender>
 
-    <logger name="org.mongodb.driver.cluster" level="INFO">
+    <logger name="org.mongodb.driver.cluster" level="WARN">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="LOG" />
     </logger>
 
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="LOG" />
     </root>

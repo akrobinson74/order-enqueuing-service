@@ -19,12 +19,11 @@ import com.phizzard.es.METRICS
 import com.phizzard.es.OPEN_API_PATH
 import com.phizzard.es.SqsConfig
 import com.phizzard.es.corsConfig
+import com.phizzard.es.handlers.ErrorHandlers
 import com.phizzard.es.handlers.MessageEnqueuingHandler
 import com.phizzard.es.handlers.OrderRetrievalHandler
 import com.phizzard.es.handlers.OrderStorageHandler
 import com.phizzard.es.handlers.buildHealthCheck
-import com.phizzard.es.handlers.defaultErrorHandler
-import com.phizzard.es.handlers.handleOpenApiValidationError
 import com.phizzard.es.mongoConfig
 import com.phizzard.es.prometheusHandler
 import com.phizzard.es.requestMarker
@@ -37,7 +36,7 @@ import io.vertx.ext.web.api.contract.openapi3.OpenAPI3RouterFactory
 import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.ext.web.handler.CorsHandler
 import io.vertx.ext.web.handler.LoggerFormat
-import io.vertx.ext.web.handler.LoggerHandler
+import io.vertx.ext.web.handler.impl.LoggerHandlerImpl
 import io.vertx.kotlin.core.http.listenAwait
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.ext.web.api.contract.openapi3.OpenAPI3RouterFactory.createAwait
@@ -74,7 +73,7 @@ class BootstrapVerticle : CoroutineVerticle() {
             .build()
 
         val router = createAwait(vertx, OPEN_API_PATH)
-            .addFailureHandlerByOperationId(CREATE_ORDER_OPERATION_ID, ::defaultErrorHandler)
+            .addFailureHandlerByOperationId(CREATE_ORDER_OPERATION_ID, ErrorHandlers()::defaultErrorHandler)
             .addHandlerByOperationId(HEALTH_CHECK, buildHealthCheck(vertx))
             .addHandlerByOperationId(METRICS, ::prometheusHandler)
             .addSuspendingHandlerByOperationId(
@@ -92,12 +91,12 @@ class BootstrapVerticle : CoroutineVerticle() {
                 handler = OrderRetrievalHandler(mongoClient)::handle,
                 operationId = GET_ORDER_OPERATION_ID
             )
-            .setValidationFailureHandler(::handleOpenApiValidationError)
+            .setValidationFailureHandler(ErrorHandlers()::handleOpenApiValidationError)
             .addGlobalHandler(CorsHandler.create(corsConfig.allowedOriginPattern)
                 .allowedHeaders(corsConfig.allowedHeaders)
                 .allowedMethods(corsConfig.allowedMethods)
             )
-            .addGlobalHandler(LoggerHandler.create(true, LoggerFormat.DEFAULT))
+            .addGlobalHandler(LoggerHandlerImpl(true, LoggerFormat.DEFAULT))
             .setBodyHandler(BodyHandler.create(false))
             .setOptions(routerOptions)
             .router

@@ -1,6 +1,6 @@
-SERVICE_NAME = $(basename $PWD)
-DOCKERREPO := $(shell aws ecr --region eu-central-1 describe-repositories --repository-names $(SERVICE_NAME) --max-items 1 --query 'repositories[0].repositoryUri' --output text)
+SERVICE_NAME = order-enqueuing-service
 VERSION ?= $(shell git describe --tags --always --abbrev=7 --dirty=-dirty-$(USER)-$(shell date -u +"%Y%m%dT%H%M%SZ"))
+DOCKERREPO := $(shell aws ecr --region eu-central-1 describe-repositories --repository-names $(SERVICE_NAME) --max-items 1 --query 'repositories[0].repositoryUri' --output text)
 service-up-compose = docker-compose -f docker/base.yml
 
 clean:
@@ -10,6 +10,7 @@ build: clean
 	./gradlew shadowJar
 
 build-docker: ecr
+	echo "DOCKERREPO: $(DOCKERREPO)"
 	docker build -f docker/app/Dockerfile -t $(DOCKERREPO) .
 
 build-local:

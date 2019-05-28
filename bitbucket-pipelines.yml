@@ -71,7 +71,7 @@ pipelines:
             - ubuntu
           script:
             - export APP_ENV=stage
-            - apt-get -y update && apt-get -y install build-essential curl gnupg libyaml-dev python2.7 python-pip sudo
+            - apt-get -y update && apt-get -y install build-essential curl gnupg libyaml-dev python2.7 python-dev python-pip sudo
             - pip install --upgrade pip
             - pip install requests[security]
             - pip install --upgrade setuptools

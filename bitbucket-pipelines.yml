@@ -62,6 +62,11 @@ pipelines:
             - gradle
           script:
             - ./gradlew :app:shadowJar
+          artifacts:
+            - docker/app/build/order-enqueuing-service.jar
+            - docker/app/build/config-prod.yml
+            - docker/app/build/newrelic.jar
+            - docker/app/build/newrelic.yml
       - step:
           name: Build Docker Image
           caches:
@@ -71,11 +76,13 @@ pipelines:
             - ubuntu
           script:
             - export APP_ENV=stage
+            - ls -altr docker/app/build/
             - apt-get -y update && apt-get -y install build-essential curl gnupg libyaml-dev python2.7 python-dev python-pip sudo
             - pip install --upgrade setuptools
             - pip install --upgrade pip
             - pip install requests[security]
             - pip install awscli
+            - ls -altr docker/app/build/
             - make release VERSION=${BITBUCKET_COMMIT:0:7}
       - step:
           name: Deploy

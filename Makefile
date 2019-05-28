@@ -11,10 +11,10 @@ build: clean
 
 build-docker: ecr
 	echo "DOCKERREPO: $(DOCKERREPO)"
-	docker build -f docker/app/Dockerfile -t $(DOCKERREPO) .
+	docker build -f docker/app/Dockerfile -t $(DOCKERREPO) ./docker/app
 
 build-local:
-	docker build -f docker/app/Dockerfile -t latest_local .
+	docker build -f docker/app/Dockerfile -t latest_local ./docker/app
 
 build-local-and-run: build-local
 	docker run -d --name oes_latest_local -p 9080:9080 latest_local

@@ -82,14 +82,6 @@ components:
           description: Country where the given address is located
           example: Germany
           type: string
-        latitude:
-          description: Latitudinal coordinate of the address
-          example: 52.431181
-          type: number
-        longitude:
-          description: Longitudinal coordinate of the address
-          example: 13.538744
-          type: number
         street:
           description: Name of the street belonging to address
           example: Am Studio
@@ -101,13 +93,9 @@ components:
         zipCode:
           description: Postal code of the address
           example: 12489
-          type: string
-      required:
-        - city
-        - country
-        - street
-        - streetNumber
-        - zipCode
+          oneOf:
+            - type: string
+            - type: number
 
     Contact:
       type: object
@@ -168,10 +156,6 @@ components:
           type: string
           format: ISO Date
           example: "2019-05-02T08:05:23.653Z"
-      required:
-        - orderItems
-        - status
-        - store
 
     OrderItem:
       type: object
@@ -186,16 +170,18 @@ components:
           type: string
         grossPrice:
           example: 64.07
-          type: number
-          format: double
+          oneOf:
+            - type: number
+            - type: string
         gtin:
           description: A unique identifier for this product
           type: string
           example: "07612997688944"
         netPrice:
           example: 69.0
-          type: number
-          format: double
+          oneOf:
+            - type: number
+            - type: string
         quantity:
           description: The amount of the particular productVariant ordered
           example: 2
@@ -205,13 +191,6 @@ components:
           description: The manufacturer and/or vendor of this product; used to split and group orderItems together
           example: kjus
           type: string
-      required:
-        - articleDescription
-        - currency
-        - gtin
-        - grossPrice
-        - quantity
-        - supplierName
 
     StoreContact:
       type: object
@@ -233,9 +212,6 @@ components:
           description: Phone number at which to reach the contact
           example: '+49123456789910'
           type: string
-      required:
-        - address
-        - phoneNumber
 
     StoreDetails:
       type: object
@@ -253,5 +229,3 @@ components:
           description: name of the store
           example: "Mondo Sport"
           type: string
-      required:
-        - name

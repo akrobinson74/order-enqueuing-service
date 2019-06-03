@@ -92,9 +92,10 @@ class BootstrapVerticle : CoroutineVerticle() {
                 operationId = GET_ORDER_OPERATION_ID
             )
             .setValidationFailureHandler(ErrorHandlers()::handleOpenApiValidationError)
-            .addGlobalHandler(CorsHandler.create(corsConfig.allowedOriginPattern)
-                .allowedHeaders(corsConfig.allowedHeaders)
-                .allowedMethods(corsConfig.allowedMethods)
+            .addGlobalHandler(
+                CorsHandler.create(corsConfig.allowedOriginPattern)
+                    .allowedHeaders(corsConfig.allowedHeaders)
+                    .allowedMethods(corsConfig.allowedMethods)
             )
             .addGlobalHandler(LoggerHandlerImpl(true, LoggerFormat.DEFAULT))
             .setBodyHandler(BodyHandler.create(false))

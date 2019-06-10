@@ -6,6 +6,16 @@ terraform {
   }
 }
 
+data "terraform_remote_state" "vpc" {
+  backend = "s3"
+
+  config {
+    bucket = "terraform-phizzard-kotlin"
+    key = "aws/vpc/terraform.tfstate"
+    region = "eu-central-1"
+  }
+}
+
 data "aws_ami" "ecs_ami" {
   most_recent = true
   owners = [

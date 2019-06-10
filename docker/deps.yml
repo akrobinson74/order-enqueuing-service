@@ -18,7 +18,7 @@ services:
     container_name: order-enqueuing-service
     image: order-enqueuing-service
     ports:
-      - "9080:8080"
+      - "9080:9080"
     volumes:
       - ./app/build/openapi.yml:/opt/api.yml
       - ./app/build/"config$${ENV:--stage}.yml":/opt/config.yml

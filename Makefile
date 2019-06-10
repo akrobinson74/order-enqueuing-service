@@ -21,12 +21,14 @@ build-local-and-run: build-local
 
 compose.deps.down:
 	$(service-up-compose) down
+	docker rm $(docker stop localmongo1 elasticmq) || true
 
 compose.deps.up: build
 	$(service-up-compose) build
 	$(service-up-compose) up elasticmq mongo1
 
 compose.service.up: build
+	docker rm $(docker stop localmongo1 elasticmq) || true
 	$(service-up-compose) build
 	$(service-up-compose) up -d
 

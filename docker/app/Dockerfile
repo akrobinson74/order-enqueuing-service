@@ -1,13 +1,10 @@
-FROM adoptopenjdk/openjdk11:alpine-slim
-
-LABEL io.k8s.description="Platform for Java (fatjar) runtime" \
-      io.openshift.expose-services="8080:http" \
-      io.openshift.tags="java,kotlin,microservices,fatjar"
+FROM adoptopenjdk/openjdk11:jdk-11.0.3_7
 
 WORKDIR /deployments
 
 # Application
-COPY build/config-prod.yml /opt/config.yml
+COPY build/wait-for-it.sh .
+COPY build/config-"${ENV:-local}".yml /opt/config.yml
 COPY build/order-enqueuing-service.jar .
 # NewRelic java agent
 COPY build/newrelic.jar /opt/newrelic/newrelic.jar

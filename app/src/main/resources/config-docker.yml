@@ -1,0 +1,30 @@
+cors:
+  allowedHeaders:
+    - Authorization
+    - Cache-Control
+    - Content-Length
+    - Content-Range
+    - DNT
+    - If-Modified-Since
+    - User-Agent
+    - X-Requested-With
+  allowedMethods:
+    - CONNECT
+    - DELETE
+    - GET
+    - HEAD
+    - OPTIONS
+    - OTHER
+    - PATCH
+    - POST
+    - PUT
+    - TRACE
+  allowedOriginPattern: "*"
+mongoConfig:
+  connection_string: mongodb://mongo1/test_orders?streamType=netty
+sqsConfig:
+  accessKeyId: x
+  queueName: test-orders
+  serviceEndpoint: http://elasticmq:9324
+  secretAccessKey: x
+  signingRegion: elasticmq

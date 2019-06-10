@@ -1,3 +1,4 @@
+
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
@@ -61,7 +62,7 @@ val copyNewRelicAgent by tasks.creating(Copy::class) {
 
 val copyNecessaryFiles by tasks.creating(Copy::class) {
     from("$projectDir/src/main/resources") {
-        include("openapi.yml", "config*.yml", "logback.xml")
+        include("openapi.yaml", "config*.yml", "logback.xml")
     }
     into("$rootDir/docker/app/build")
 }
@@ -86,6 +87,6 @@ tasks {
 
         dependsOn.add(copyNewRelicAgent)
         dependsOn.add(copyNecessaryFiles)
-        dependsOn.add(renameProdConfig)
+        if (System.getenv("ENV")?.equals("prod") ?: false) dependsOn.add(renameProdConfig)
     }
 }

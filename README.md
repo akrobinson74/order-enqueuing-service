@@ -27,14 +27,17 @@ We already assume you have successfully installed Docker on your local machine.
 If you haven't done so, do so now.  If you can't get it working it's time to
 consider new career options.
 
+#### Mac OS
+
+
 ### SDKMAN!
 SDKMAN! is a command-line utility that allows you to install and run mulitple
 versions of Java, Kotlin, and Gradle (at a minimum).  Please follow the
 installation instructions here: https://sdkman.io/install
 
 ```
-$ url -s "https://get.sdkman.io" | bash
-$ source "/Users/Guest/.sdkman/bin/sdkman-init.sh"
+$ curl -s "https://get.sdkman.io" | bash
+$ source "/${YOUR_HOME_DIR}/.sdkman/bin/sdkman-init.sh"
 
 # to verify installation
 $ sdk version

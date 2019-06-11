@@ -36,9 +36,9 @@ data "terraform_remote_state" "vpc" {
   }
 }
 
-variable "ecs_cluster_id" {}
+//variable "ecs_cluster_id" {}
 
-variable "ecs_servicerole_arn" {}
+//variable "ecs_servicerole_arn" {}
 
 variable "env" {}
 
@@ -70,7 +70,7 @@ variable "route_priority" {
   default = 100
 }
 
-variable "version" {}
+//variable "version" {}
 
 data "template_file" "service" {
   template = <<EOD
@@ -154,7 +154,7 @@ resource "aws_ecs_service" "service" {
 }
 
 data "aws_lb" "test" {
-  arn = "${data.terraform_remote_state.lb.lb_arn}"
+  arn = "${data.terraform_remote_state.lb.id}"
 }
 
 resource "aws_alb_target_group" "service" {
@@ -170,17 +170,17 @@ resource "aws_alb_target_group" "service" {
 }
 
 data "aws_lb_listener" "listener" {
-  load_balancer_arn = "${data.terraform_remote_state.lb.lb_arn}"
+  load_balancer_arn = "${data.terraform_remote_state.lb.}"
   port              = 9080
 }
 
 resource "aws_alb_listener_rule" "service" {
-  listener_arn = "${data.aws_lb_listener.listener.arn}"
+  listener_arn = "${data.aws_lb_listener.listener.id}"
   priority     = "${var.route_priority}"
 
   action {
     type             = "forward"
-    target_group_arn = "${aws_alb_target_group.service.arn}"
+    target_group_arn = "${aws_alb_target_group.service.id}"
   }
 
   condition {

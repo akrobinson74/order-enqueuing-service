@@ -50,11 +50,9 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route" "public" {
-  count = "${length(var.aws_availability_zones)}"
   destination_cidr_block = "0.0.0.0/0"
   gateway_id = "${aws_internet_gateway.order_services_gtw.id}"
   route_table_id = "${aws_route_table.public.id}"
-  subnet_id = "${element(aws_subnet.public.*.id, count.index)}"
 }
 
 resource "aws_route_table_association" "public" {

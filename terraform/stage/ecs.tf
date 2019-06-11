@@ -6,16 +6,6 @@ terraform {
   }
 }
 
-data "terraform_remote_state" "vpc" {
-  backend = "s3"
-
-  config {
-    bucket = "terraform-phizzard-kotlin"
-    key = "aws/vpc/terraform.tfstate"
-    region = "eu-central-1"
-  }
-}
-
 data "aws_ami" "ecs_ami" {
   most_recent = true
   owners = [
@@ -160,6 +150,30 @@ resource "aws_iam_instance_profile" "cluster" {
   role = "${aws_iam_role.cluster.name}"
 }
 
+resource "aws_security_group" "ecs_instance" {
+  name = "ecs-instance"
+  description = "Instance SG for ECS"
+  vpc_id = "${aws_vpc.order_services.id}"
+}
+
+resource "aws_security_group_rule" "inbound_all" {
+  cidr_blocks = ["0.0.0.0/0"]
+  from_port = 0
+  protocol = "-1"
+  security_group_id = "${aws_security_group.ecs_instance.id}"
+  to_port = 0
+  type = "ingress"
+}
+
+resource "aws_security_group_rule" "outbound_all" {
+  cidr_blocks = ["0.0.0.0/0"]
+  from_port = 0
+  protocol = "-1"
+  security_group_id = "${aws_security_group.ecs_instance.id}"
+  to_port = 0
+  type = "egress"
+}
+
 resource "aws_security_group" "ecs-elb" {
   description = "elb for ecs"
   vpc_id = "${aws_vpc.order_services.id}"
@@ -252,15 +266,15 @@ output "ecs-elb-securitygroup-id" {
 }
 
 output "ecs-instance-securitygroup-id" {
-  value = ""
+  value = "${aws_security_group.ecs_instance.id}"
 }
 
 output "ecs-servicerole-arn" {
-  value = "${}"
+  value = "${aws_iam_role.services.arn}"
 }
 
 output "elb_security_group_id" {
-  value = ""
+  value = "${aws_security_group.ecs-elb.id}"
 }
 
 output "public_subnet_ids" {

@@ -36,9 +36,9 @@ data "terraform_remote_state" "vpc" {
   }
 }
 
-variable "ecs_cluster_id" {}
+//variable "ecs_cluster_id" {}
 
-variable "ecs_servicerole_arn" {}
+//variable "ecs_servicerole_arn" {}
 
 variable "env" {}
 
@@ -50,7 +50,9 @@ variable "health_check_code" {
   default = "200"
 }
 
-variable "host_header" {}
+variable "host_header" {
+  default = "staging.oes.app"
+}
 
 variable "instace_count" {
   default = 1
@@ -68,7 +70,7 @@ variable "route_priority" {
   default = 100
 }
 
-variable "version" {}
+//variable "version" {}
 
 data "template_file" "service" {
   template = <<EOD
@@ -83,10 +85,6 @@ data "template_file" "service" {
       {
         "name": "SQS_URL",
         "value": "https://sqs.eu-central-1.amazonaws.com/806353235757/test-orders"
-      },
-      {
-        "name": "PMA_ABSOLUTE_URI",
-        "value": "${hostname}"
       }
     ],
     "essential": true,
@@ -107,10 +105,6 @@ data "template_file" "service" {
       {
         "name": "ORDER_SERVICE_URL",
         "value": "http://oes:9080"
-      },
-      {
-        "name": "PMA_ABSOLUTE_URI",
-        "value": "${hostname}"
       }
     ],
     "essential": true,
@@ -143,12 +137,12 @@ resource "aws_ecs_task_definition" "service" {
 
 resource "aws_ecs_service" "service" {
   name                               = "order-services-${var.env}"
-  cluster                            = "${var.ecs_cluster_id}"
+  cluster                            = "${aws_ecs_cluster.ecs.id}"
   task_definition                    = "${aws_ecs_task_definition.service.arn}"
   deployment_minimum_healthy_percent = 0
   deployment_maximum_percent         = 200
   desired_count                      = "${var.instace_count}"
-  iam_role                           = "${var.ecs_servicerole_arn}"
+  iam_role                           = "${aws_iam_role.services.arn}"
 
   depends_on = ["aws_alb_target_group.service"]
 
@@ -160,7 +154,7 @@ resource "aws_ecs_service" "service" {
 }
 
 data "aws_lb" "test" {
-  arn = "${data.terraform_remote_state.lb.lb_arn}"
+  arn = "${data.terraform_remote_state.lb.id}"
 }
 
 resource "aws_alb_target_group" "service" {
@@ -176,17 +170,17 @@ resource "aws_alb_target_group" "service" {
 }
 
 data "aws_lb_listener" "listener" {
-  load_balancer_arn = "${data.terraform_remote_state.lb.lb_arn}"
+  load_balancer_arn = "${data.terraform_remote_state.lb.}"
   port              = 9080
 }
 
 resource "aws_alb_listener_rule" "service" {
-  listener_arn = "${data.aws_lb_listener.listener.arn}"
+  listener_arn = "${data.aws_lb_listener.listener.id}"
   priority     = "${var.route_priority}"
 
   action {
     type             = "forward"
-    target_group_arn = "${aws_alb_target_group.service.arn}"
+    target_group_arn = "${aws_alb_target_group.service.id}"
   }
 
   condition {

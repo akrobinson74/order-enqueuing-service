@@ -64,7 +64,7 @@ pipelines:
             - ./gradlew :app:shadowJar
           artifacts:
             - docker/app/build/order-enqueuing-service.jar
-            - docker/app/build/config-prod.yml
+            - docker/app/build/config*.yml
             - docker/app/build/newrelic.jar
             - docker/app/build/newrelic.yml
             - docker/app/build/wait-for-it.sh

@@ -4,7 +4,7 @@ WORKDIR /deployments
 
 # Application
 COPY build/wait-for-it.sh .
-COPY build/config-"${ENV:-local}".yml /opt/config.yml
+COPY build/config-"${ENV:-stage}".yml /opt/config.yml
 COPY build/order-enqueuing-service.jar .
 # NewRelic java agent
 COPY build/newrelic.jar /opt/newrelic/newrelic.jar

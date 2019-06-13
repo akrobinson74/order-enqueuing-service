@@ -32,12 +32,12 @@ val JsonObject.elasticSearch: ElasticsearchConfig
     get() = getJsonObject("elasticSearch").mapTo(ElasticsearchConfig::class.java)
 
 data class MongoConfig(
-    val connection_string: String = "mongodb://127.0.0.1",
-    val db_name: String = "orders",
-    val host: String = "127.0.0.1",
-    val password: String = "",
-    val port: Int = 27017,
-    val username: String = ""
+    val connection_string: String,
+    val db_name: String,
+    val host: String,
+    val password: String,
+    val port: Int,
+    val username: String
 )
 
 val JsonObject.mongoConfig: JsonObject
@@ -45,11 +45,11 @@ val JsonObject.mongoConfig: JsonObject
         .overrideConfigValuesWithEnvVars(mapOf("connection_string" to MONGO_URL))
 
 data class SqsConfig(
-    val accessKeyId: String = "x",
-    val queueName: String = "incoming-orders",
-    val secretAccessKey: String = "x",
-    val serviceEndpoint: String = "http://localhost:9324",
-    val signingRegion: String = "elasticmq"
+    val accessKeyId: String,
+    val queueName: String,
+    val secretAccessKey: String,
+    val serviceEndpoint: String,
+    val signingRegion: String
 )
 
 val JsonObject.sqsConfig: SqsConfig

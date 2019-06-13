@@ -93,9 +93,7 @@ components:
         zipCode:
           description: Postal code of the address
           example: 12489
-          oneOf:
-            - type: string
-            - type: number
+          type: string
 
     Contact:
       type: object
@@ -129,11 +127,6 @@ components:
     Order:
       type: object
       properties:
-        id:
-          description: Database id of the product
-          example: 123467890
-          format: int64
-          type: integer
         approvalCode:
           type: string
           example: "I really approve of you"

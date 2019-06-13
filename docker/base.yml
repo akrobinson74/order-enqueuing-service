@@ -2,24 +2,22 @@ version: '3.7'
 
 services:
   elasticmq:
-    build: elasticmq
     container_name: elasticmq
+    image: softwaremill/elasticmq:latest
     networks:
       - oes
     ports:
       - "9324:9324"
   mongo1:
-    hostname: mongo1
-    container_name: localmongo1
-    image: mongo:3.6-jessie
+    container_name: mongo1
+    image: mongo:latest
     networks:
       - oes
     ports:
       - "27017:27017"
     restart: always
   order-enqueuing-service:
-    build: app
-    command: ["./wait-for-it.sh", "localhost:9324", "--", "java", "-jar", "order-enqueuing-service.jar", "/opt/config.yml"]
+    command: ["./wait-for-it.sh", "elasticmq:9324", "--", "java", "-jar", "order-enqueuing-service.jar", "/opt/config.yml"]
     container_name: order-enqueuing-service
     depends_on:
       - elasticmq

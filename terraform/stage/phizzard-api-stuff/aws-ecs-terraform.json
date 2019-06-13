@@ -1,0 +1,701 @@
+{
+    "version": 3,
+    "terraform_version": "0.11.7",
+    "serial": 18,
+    "lineage": "bfc35ab4-d32c-c09f-c541-8b81bdecae5e",
+    "modules": [
+        {
+            "path": [
+                "root"
+            ],
+            "outputs": {
+                "ecs-cluster-id": {
+                    "sensitive": false,
+                    "type": "string",
+                    "value": "arn:aws:ecs:eu-central-1:806353235757:cluster/phizzard"
+                },
+                "ecs-servicerole-arn": {
+                    "sensitive": false,
+                    "type": "string",
+                    "value": "arn:aws:iam::806353235757:role/phizzard-servicerole"
+                },
+                "elb_security_group_id": {
+                    "sensitive": false,
+                    "type": "string",
+                    "value": "sg-1233087f"
+                }
+            },
+            "resources": {
+                "data.terraform_remote_state.vpc": {
+                    "type": "terraform_remote_state",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "2018-05-29 20:32:34.578924946 +0000 UTC",
+                        "attributes": {
+                            "aws_region": "eu-central-1",
+                            "backend": "s3",
+                            "config.%": "3",
+                            "config.bucket": "terraform-phizzard",
+                            "config.key": "aws/vpc/terraform.tfstate",
+                            "config.region": "eu-central-1",
+                            "environment": "default",
+                            "id": "2018-05-29 20:32:34.578924946 +0000 UTC",
+                            "vpc_id": "vpc-a1314dca",
+                            "workspace": "default"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.terraform"
+                }
+            },
+            "depends_on": []
+        },
+        {
+            "path": [
+                "root",
+                "ecs"
+            ],
+            "outputs": {
+                "ecs-cluster-id": {
+                    "sensitive": false,
+                    "type": "string",
+                    "value": "arn:aws:ecs:eu-central-1:806353235757:cluster/phizzard"
+                },
+                "ecs-elb-securitygroup-id": {
+                    "sensitive": false,
+                    "type": "string",
+                    "value": "sg-1233087f"
+                },
+                "ecs-instance-securitygroup-id": {
+                    "sensitive": false,
+                    "type": "string",
+                    "value": "sg-1333087e"
+                },
+                "ecs-servicerole-arn": {
+                    "sensitive": false,
+                    "type": "string",
+                    "value": "arn:aws:iam::806353235757:role/phizzard-servicerole"
+                }
+            },
+            "resources": {
+                "aws_autoscaling_group.ecs": {
+                    "type": "aws_autoscaling_group",
+                    "depends_on": [
+                        "aws_launch_configuration.ecs",
+                        "data.aws_subnet_ids.vpc"
+                    ],
+                    "primary": {
+                        "id": "ECS-phizzard",
+                        "attributes": {
+                            "arn": "arn:aws:autoscaling:eu-central-1:806353235757:autoScalingGroup:3297296c-0ce9-4c69-9ac6-d52bfe0bfa66:autoScalingGroupName/ECS-phizzard",
+                            "availability_zones.#": "3",
+                            "availability_zones.1126047633": "eu-central-1a",
+                            "availability_zones.2903539389": "eu-central-1c",
+                            "availability_zones.3658960427": "eu-central-1b",
+                            "default_cooldown": "300",
+                            "desired_capacity": "6",
+                            "enabled_metrics.#": "0",
+                            "force_delete": "false",
+                            "health_check_grace_period": "300",
+                            "health_check_type": "EC2",
+                            "id": "ECS-phizzard",
+                            "launch_configuration": "ECS-phizzard-20180525110736361100000001",
+                            "launch_template.#": "0",
+                            "load_balancers.#": "0",
+                            "max_size": "6",
+                            "metrics_granularity": "1Minute",
+                            "min_size": "6",
+                            "name": "ECS-phizzard",
+                            "placement_group": "",
+                            "protect_from_scale_in": "false",
+                            "service_linked_role_arn": "arn:aws:iam::806353235757:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                            "suspended_processes.#": "0",
+                            "tag.#": "1",
+                            "tag.2460163689.key": "Name",
+                            "tag.2460163689.propagate_at_launch": "true",
+                            "tag.2460163689.value": "phizzard-cluster-node",
+                            "target_group_arns.#": "0",
+                            "termination_policies.#": "0",
+                            "vpc_zone_identifier.#": "3",
+                            "vpc_zone_identifier.2834894757": "subnet-2d89fa60",
+                            "vpc_zone_identifier.4174075323": "subnet-5c8ee821",
+                            "vpc_zone_identifier.983063881": "subnet-120e2679",
+                            "wait_for_capacity_timeout": "10m"
+                        },
+                        "meta": {
+                            "e2bfb730-ecaa-11e6-8f88-34363bc7c4c0": {
+                                "delete": 600000000000
+                            }
+                        },
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "aws_cloudwatch_log_group.service": {
+                    "type": "aws_cloudwatch_log_group",
+                    "depends_on": [
+                        "aws_ecs_cluster.main"
+                    ],
+                    "primary": {
+                        "id": "ecsAgent-phizzard",
+                        "attributes": {
+                            "arn": "arn:aws:logs:eu-central-1:806353235757:log-group:ecsAgent-phizzard:*",
+                            "id": "ecsAgent-phizzard",
+                            "kms_key_id": "",
+                            "name": "ecsAgent-phizzard",
+                            "retention_in_days": "0",
+                            "tags.%": "0"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "aws_ecs_cluster.main": {
+                    "type": "aws_ecs_cluster",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "arn:aws:ecs:eu-central-1:806353235757:cluster/phizzard",
+                        "attributes": {
+                            "arn": "arn:aws:ecs:eu-central-1:806353235757:cluster/phizzard",
+                            "id": "arn:aws:ecs:eu-central-1:806353235757:cluster/phizzard",
+                            "name": "phizzard"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "aws_iam_instance_profile.ecs": {
+                    "type": "aws_iam_instance_profile",
+                    "depends_on": [
+                        "aws_iam_role.ecs"
+                    ],
+                    "primary": {
+                        "id": "phizzard-ecs-iam-instance-profile",
+                        "attributes": {
+                            "arn": "arn:aws:iam::806353235757:instance-profile/phizzard-ecs-iam-instance-profile",
+                            "id": "phizzard-ecs-iam-instance-profile",
+                            "name": "phizzard-ecs-iam-instance-profile",
+                            "path": "/",
+                            "role": "phizzard-ecs-iam-role",
+                            "roles.#": "1",
+                            "roles.3037228215": "phizzard-ecs-iam-role",
+                            "unique_id": "AIPAJPW33QC2WUZP3CSUS"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "aws_iam_role.ecs": {
+                    "type": "aws_iam_role",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "phizzard-ecs-iam-role",
+                        "attributes": {
+                            "arn": "arn:aws:iam::806353235757:role/phizzard-ecs-iam-role",
+                            "assume_role_policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+                            "create_date": "2018-05-23T17:55:15Z",
+                            "force_detach_policies": "false",
+                            "id": "phizzard-ecs-iam-role",
+                            "max_session_duration": "3600",
+                            "name": "phizzard-ecs-iam-role",
+                            "path": "/",
+                            "unique_id": "AROAJIGNWHCRJYC6LZ7HM"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "aws_iam_role.ecs-service": {
+                    "type": "aws_iam_role",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "phizzard-servicerole",
+                        "attributes": {
+                            "arn": "arn:aws:iam::806353235757:role/phizzard-servicerole",
+                            "assume_role_policy": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ecs.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+                            "create_date": "2018-05-23T17:55:15Z",
+                            "force_detach_policies": "false",
+                            "id": "phizzard-servicerole",
+                            "max_session_duration": "3600",
+                            "name": "phizzard-servicerole",
+                            "path": "/",
+                            "unique_id": "AROAJC4WUZR6THZEPGHUG"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "aws_iam_role_policy.ecs": {
+                    "type": "aws_iam_role_policy",
+                    "depends_on": [
+                        "aws_iam_role.ecs"
+                    ],
+                    "primary": {
+                        "id": "phizzard-ecs-iam-role:phizzard-ecs",
+                        "attributes": {
+                            "id": "phizzard-ecs-iam-role:phizzard-ecs",
+                            "name": "phizzard-ecs",
+                            "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"ecs:CreateCluster\",\n        \"ecs:DeregisterContainerInstance\",\n        \"ecs:DiscoverPollEndpoint\",\n        \"ecs:Poll\",\n        \"ecs:RegisterContainerInstance\",\n        \"ecs:StartTelemetrySession\",\n        \"ecs:Submit*\",\n        \"ecr:GetAuthorizationToken\",\n        \"ecr:BatchCheckLayerAvailability\",\n        \"ecr:GetDownloadUrlForLayer\",\n        \"ecr:BatchGetImage\",\n        \"ec2:AuthorizeSecurityGroupEgress\",\n        \"ec2:AuthorizeSecurityGroupIngress\",\n        \"ec2:CreateSecurityGroup\",\n        \"ec2:DeleteSecurityGroup\",\n        \"s3:*\",\n        \"logs:CreateLogGroup\",\n        \"logs:CreateLogStream\",\n        \"logs:PutLogEvents\",\n        \"logs:DescribeLogStreams\"\n      ],\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+                            "role": "phizzard-ecs-iam-role"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "aws_iam_role_policy.ecs-service": {
+                    "type": "aws_iam_role_policy",
+                    "depends_on": [
+                        "aws_iam_role.ecs-service"
+                    ],
+                    "primary": {
+                        "id": "phizzard-servicerole:phizzard-ecs-service-policy",
+                        "attributes": {
+                            "id": "phizzard-servicerole:phizzard-ecs-service-policy",
+                            "name": "phizzard-ecs-service-policy",
+                            "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"elasticloadbalancing:Describe*\",\n        \"elasticloadbalancing:DeregisterInstancesFromLoadBalancer\",\n        \"elasticloadbalancing:RegisterInstancesWithLoadBalancer\",\n        \"elasticloadbalancing:DeregisterTargets\",\n        \"elasticloadbalancing:RegisterTargets\",\n        \"ec2:Describe*\",\n        \"ec2:AuthorizeSecurityGroupEgress\",\n        \"ec2:AuthorizeSecurityGroupIngress\",\n        \"ec2:CreateSecurityGroup\",\n        \"ec2:DeleteSecurityGroup\",\n        \"ecr:GetAuthorizationToken\",\n        \"ecr:BatchCheckLayerAvailability\",\n        \"ecr:GetDownloadUrlForLayer\",\n        \"ecr:BatchGetImage\",\n        \"logs:CreateLogStream\",\n        \"logs:PutLogEvents\"\n      ],\n      \"Resource\": [\n        \"*\"\n      ]\n    }\n  ]\n}\n",
+                            "role": "phizzard-servicerole"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "aws_launch_configuration.ecs": {
+                    "type": "aws_launch_configuration",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "ECS-phizzard-20180525110736361100000001",
+                        "attributes": {
+                            "associate_public_ip_address": "false",
+                            "ebs_block_device.#": "0",
+                            "ebs_optimized": "false",
+                            "enable_monitoring": "true",
+                            "ephemeral_block_device.#": "0",
+                            "iam_instance_profile": "phizzard-ecs-iam-instance-profile",
+                            "id": "ECS-phizzard-20180525110736361100000001",
+                            "image_id": "ami-10e6c8fb",
+                            "instance_type": "t2.micro",
+                            "key_name": "phizzard_app_api",
+                            "name": "ECS-phizzard-20180525110736361100000001",
+                            "name_prefix": "ECS-phizzard-",
+                            "root_block_device.#": "0",
+                            "security_groups.#": "1",
+                            "security_groups.2412633584": "sg-1333087e",
+                            "spot_price": "",
+                            "user_data": "b1835974d7b4b8daed21c0e57b88776afb86db43",
+                            "vpc_classic_link_id": "",
+                            "vpc_classic_link_security_groups.#": "0"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "aws_security_group.ecs-elb": {
+                    "type": "aws_security_group",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "sg-1233087f",
+                        "attributes": {
+                            "arn": "arn:aws:ec2:eu-central-1:806353235757:security-group/sg-1233087f",
+                            "description": "ELBs for ECS",
+                            "egress.#": "1",
+                            "egress.482069346.cidr_blocks.#": "1",
+                            "egress.482069346.cidr_blocks.0": "0.0.0.0/0",
+                            "egress.482069346.description": "",
+                            "egress.482069346.from_port": "0",
+                            "egress.482069346.ipv6_cidr_blocks.#": "0",
+                            "egress.482069346.prefix_list_ids.#": "0",
+                            "egress.482069346.protocol": "-1",
+                            "egress.482069346.security_groups.#": "0",
+                            "egress.482069346.self": "false",
+                            "egress.482069346.to_port": "0",
+                            "id": "sg-1233087f",
+                            "ingress.#": "2",
+                            "ingress.2214680975.cidr_blocks.#": "1",
+                            "ingress.2214680975.cidr_blocks.0": "0.0.0.0/0",
+                            "ingress.2214680975.description": "",
+                            "ingress.2214680975.from_port": "80",
+                            "ingress.2214680975.ipv6_cidr_blocks.#": "0",
+                            "ingress.2214680975.protocol": "tcp",
+                            "ingress.2214680975.security_groups.#": "0",
+                            "ingress.2214680975.self": "false",
+                            "ingress.2214680975.to_port": "80",
+                            "ingress.2617001939.cidr_blocks.#": "1",
+                            "ingress.2617001939.cidr_blocks.0": "0.0.0.0/0",
+                            "ingress.2617001939.description": "",
+                            "ingress.2617001939.from_port": "443",
+                            "ingress.2617001939.ipv6_cidr_blocks.#": "0",
+                            "ingress.2617001939.protocol": "tcp",
+                            "ingress.2617001939.security_groups.#": "0",
+                            "ingress.2617001939.self": "false",
+                            "ingress.2617001939.to_port": "443",
+                            "name": "phizzard-ecs-elb",
+                            "owner_id": "806353235757",
+                            "revoke_rules_on_delete": "false",
+                            "tags.%": "1",
+                            "tags.Name": "phizzard-ecs-elb",
+                            "vpc_id": "vpc-a1314dca"
+                        },
+                        "meta": {
+                            "e2bfb730-ecaa-11e6-8f88-34363bc7c4c0": {
+                                "create": 600000000000,
+                                "delete": 600000000000
+                            },
+                            "schema_version": "1"
+                        },
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "aws_security_group.ecs_instance": {
+                    "type": "aws_security_group",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "sg-1333087e",
+                        "attributes": {
+                            "arn": "arn:aws:ec2:eu-central-1:806353235757:security-group/sg-1333087e",
+                            "description": "Instance SG for ECS",
+                            "egress.#": "1",
+                            "egress.482069346.cidr_blocks.#": "1",
+                            "egress.482069346.cidr_blocks.0": "0.0.0.0/0",
+                            "egress.482069346.description": "",
+                            "egress.482069346.from_port": "0",
+                            "egress.482069346.ipv6_cidr_blocks.#": "0",
+                            "egress.482069346.prefix_list_ids.#": "0",
+                            "egress.482069346.protocol": "-1",
+                            "egress.482069346.security_groups.#": "0",
+                            "egress.482069346.self": "false",
+                            "egress.482069346.to_port": "0",
+                            "id": "sg-1333087e",
+                            "ingress.#": "1",
+                            "ingress.3077261164.cidr_blocks.#": "1",
+                            "ingress.3077261164.cidr_blocks.0": "0.0.0.0/0",
+                            "ingress.3077261164.description": "",
+                            "ingress.3077261164.from_port": "0",
+                            "ingress.3077261164.ipv6_cidr_blocks.#": "0",
+                            "ingress.3077261164.protocol": "-1",
+                            "ingress.3077261164.security_groups.#": "1",
+                            "ingress.3077261164.security_groups.2964555774": "sg-1233087f",
+                            "ingress.3077261164.self": "false",
+                            "ingress.3077261164.to_port": "0",
+                            "name": "phizzard-ecs-instance",
+                            "owner_id": "806353235757",
+                            "revoke_rules_on_delete": "false",
+                            "tags.%": "1",
+                            "tags.Name": "phizzard ecs-instance",
+                            "vpc_id": "vpc-a1314dca"
+                        },
+                        "meta": {
+                            "e2bfb730-ecaa-11e6-8f88-34363bc7c4c0": {
+                                "create": 600000000000,
+                                "delete": 600000000000
+                            },
+                            "schema_version": "1"
+                        },
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "aws_security_group_rule.ecs_instance_egress_all": {
+                    "type": "aws_security_group_rule",
+                    "depends_on": [
+                        "aws_security_group.ecs_instance"
+                    ],
+                    "primary": {
+                        "id": "sgrule-3551380561",
+                        "attributes": {
+                            "cidr_blocks.#": "1",
+                            "cidr_blocks.0": "0.0.0.0/0",
+                            "description": "",
+                            "from_port": "0",
+                            "id": "sgrule-3551380561",
+                            "ipv6_cidr_blocks.#": "0",
+                            "prefix_list_ids.#": "0",
+                            "protocol": "-1",
+                            "security_group_id": "sg-1333087e",
+                            "self": "false",
+                            "to_port": "0",
+                            "type": "egress"
+                        },
+                        "meta": {
+                            "schema_version": "2"
+                        },
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "aws_security_group_rule.ecs_instance_ingress_all": {
+                    "type": "aws_security_group_rule",
+                    "depends_on": [
+                        "aws_security_group.ecs_instance"
+                    ],
+                    "primary": {
+                        "id": "sgrule-2663247858",
+                        "attributes": {
+                            "cidr_blocks.#": "1",
+                            "cidr_blocks.0": "0.0.0.0/0",
+                            "description": "",
+                            "from_port": "0",
+                            "id": "sgrule-2663247858",
+                            "ipv6_cidr_blocks.#": "0",
+                            "prefix_list_ids.#": "0",
+                            "protocol": "-1",
+                            "security_group_id": "sg-1333087e",
+                            "self": "false",
+                            "to_port": "0",
+                            "type": "ingress"
+                        },
+                        "meta": {
+                            "schema_version": "2"
+                        },
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "aws_security_group_rule.ecs_instance_ingress_elb": {
+                    "type": "aws_security_group_rule",
+                    "depends_on": [
+                        "aws_security_group.ecs-elb",
+                        "aws_security_group.ecs_instance"
+                    ],
+                    "primary": {
+                        "id": "sgrule-388404752",
+                        "attributes": {
+                            "cidr_blocks.#": "0",
+                            "description": "",
+                            "from_port": "0",
+                            "id": "sgrule-388404752",
+                            "ipv6_cidr_blocks.#": "0",
+                            "prefix_list_ids.#": "0",
+                            "protocol": "-1",
+                            "security_group_id": "sg-1333087e",
+                            "self": "false",
+                            "source_security_group_id": "sg-1233087f",
+                            "to_port": "0",
+                            "type": "ingress"
+                        },
+                        "meta": {
+                            "schema_version": "2"
+                        },
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "aws_security_group_rule.elb_egress_all": {
+                    "type": "aws_security_group_rule",
+                    "depends_on": [
+                        "aws_security_group.ecs-elb"
+                    ],
+                    "primary": {
+                        "id": "sgrule-3948975116",
+                        "attributes": {
+                            "cidr_blocks.#": "1",
+                            "cidr_blocks.0": "0.0.0.0/0",
+                            "description": "",
+                            "from_port": "0",
+                            "id": "sgrule-3948975116",
+                            "ipv6_cidr_blocks.#": "0",
+                            "prefix_list_ids.#": "0",
+                            "protocol": "-1",
+                            "security_group_id": "sg-1233087f",
+                            "self": "false",
+                            "to_port": "0",
+                            "type": "egress"
+                        },
+                        "meta": {
+                            "schema_version": "2"
+                        },
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "aws_security_group_rule.elb_ingress_http": {
+                    "type": "aws_security_group_rule",
+                    "depends_on": [
+                        "aws_security_group.ecs-elb"
+                    ],
+                    "primary": {
+                        "id": "sgrule-3759930063",
+                        "attributes": {
+                            "cidr_blocks.#": "1",
+                            "cidr_blocks.0": "0.0.0.0/0",
+                            "description": "",
+                            "from_port": "80",
+                            "id": "sgrule-3759930063",
+                            "ipv6_cidr_blocks.#": "0",
+                            "prefix_list_ids.#": "0",
+                            "protocol": "tcp",
+                            "security_group_id": "sg-1233087f",
+                            "self": "false",
+                            "to_port": "80",
+                            "type": "ingress"
+                        },
+                        "meta": {
+                            "schema_version": "2"
+                        },
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "aws_security_group_rule.elb_ingress_https": {
+                    "type": "aws_security_group_rule",
+                    "depends_on": [
+                        "aws_security_group.ecs-elb"
+                    ],
+                    "primary": {
+                        "id": "sgrule-3072938602",
+                        "attributes": {
+                            "cidr_blocks.#": "1",
+                            "cidr_blocks.0": "0.0.0.0/0",
+                            "description": "",
+                            "from_port": "443",
+                            "id": "sgrule-3072938602",
+                            "ipv6_cidr_blocks.#": "0",
+                            "prefix_list_ids.#": "0",
+                            "protocol": "tcp",
+                            "security_group_id": "sg-1233087f",
+                            "self": "false",
+                            "to_port": "443",
+                            "type": "ingress"
+                        },
+                        "meta": {
+                            "schema_version": "2"
+                        },
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "data.aws_ami.amz_linux_latest": {
+                    "type": "aws_ami",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "ami-10e6c8fb",
+                        "attributes": {
+                            "architecture": "x86_64",
+                            "block_device_mappings.#": "2",
+                            "block_device_mappings.2538004115.device_name": "/dev/xvdcz",
+                            "block_device_mappings.2538004115.ebs.%": "5",
+                            "block_device_mappings.2538004115.ebs.delete_on_termination": "true",
+                            "block_device_mappings.2538004115.ebs.encrypted": "false",
+                            "block_device_mappings.2538004115.ebs.iops": "0",
+                            "block_device_mappings.2538004115.ebs.volume_size": "22",
+                            "block_device_mappings.2538004115.ebs.volume_type": "gp2",
+                            "block_device_mappings.2538004115.no_device": "",
+                            "block_device_mappings.2538004115.virtual_name": "",
+                            "block_device_mappings.340275815.device_name": "/dev/xvda",
+                            "block_device_mappings.340275815.ebs.%": "6",
+                            "block_device_mappings.340275815.ebs.delete_on_termination": "true",
+                            "block_device_mappings.340275815.ebs.encrypted": "false",
+                            "block_device_mappings.340275815.ebs.iops": "0",
+                            "block_device_mappings.340275815.ebs.snapshot_id": "snap-0f0b90141005bdd49",
+                            "block_device_mappings.340275815.ebs.volume_size": "8",
+                            "block_device_mappings.340275815.ebs.volume_type": "gp2",
+                            "block_device_mappings.340275815.no_device": "",
+                            "block_device_mappings.340275815.virtual_name": "",
+                            "creation_date": "2018-05-17T14:50:29.000Z",
+                            "description": "Amazon Linux AMI 2018.03.a x86_64 ECS HVM GP2",
+                            "filter.#": "1",
+                            "filter.3034728270.name": "name",
+                            "filter.3034728270.values.#": "1",
+                            "filter.3034728270.values.0": "amzn-ami-*-ecs-optimized",
+                            "hypervisor": "xen",
+                            "id": "ami-10e6c8fb",
+                            "image_id": "ami-10e6c8fb",
+                            "image_location": "amazon/amzn-ami-2018.03.a-amazon-ecs-optimized",
+                            "image_owner_alias": "amazon",
+                            "image_type": "machine",
+                            "most_recent": "true",
+                            "name": "amzn-ami-2018.03.a-amazon-ecs-optimized",
+                            "owner_id": "591542846629",
+                            "owners.#": "1",
+                            "owners.0": "amazon",
+                            "product_codes.#": "0",
+                            "public": "true",
+                            "root_device_name": "/dev/xvda",
+                            "root_device_type": "ebs",
+                            "root_snapshot_id": "snap-0f0b90141005bdd49",
+                            "sriov_net_support": "simple",
+                            "state": "available",
+                            "state_reason.%": "2",
+                            "state_reason.code": "UNSET",
+                            "state_reason.message": "UNSET",
+                            "tags.%": "0",
+                            "virtualization_type": "hvm"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "data.aws_subnet_ids.vpc": {
+                    "type": "aws_subnet_ids",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "vpc-a1314dca",
+                        "attributes": {
+                            "id": "vpc-a1314dca",
+                            "ids.#": "3",
+                            "ids.2834894757": "subnet-2d89fa60",
+                            "ids.4174075323": "subnet-5c8ee821",
+                            "ids.983063881": "subnet-120e2679",
+                            "vpc_id": "vpc-a1314dca"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.aws"
+                },
+                "data.template_file.ecs_userdata": {
+                    "type": "template_file",
+                    "depends_on": [
+                        "aws_ecs_cluster.main"
+                    ],
+                    "primary": {
+                        "id": "2b27c69ba0be9e11c50120fa0ea671eb7fefe71ec646d0c36cf65138713cbb0f",
+                        "attributes": {
+                            "id": "2b27c69ba0be9e11c50120fa0ea671eb7fefe71ec646d0c36cf65138713cbb0f",
+                            "rendered": "#!/bin/bash\n\nyum install -y aws-cli \nyum update -y \nyum -y install ecs-init awslogs\necho ECS_CLUSTER=phizzard \u003e\u003e /etc/ecs/ecs.config\necho ECS_LOGFILE=/log/ecs-agent.log \u003e\u003e /etc/ecs/ecs.config\n\nmkdir -p /var/log/ecs\nmkdir -p /var/awslogs/state\nmkdir -p /etc/awslogs\n\nINSTANCE_ID=$(curl 169.254.169.254/latest/meta-data/instance-id)\ncat\u003e/etc/awslogs/awslogs.conf\u003c\u003cEOT\n[general]\nstate_file = /var/awslogs/state/agent-state  \n\n[ecs_agent_log]\nfile = /var/log/ecs/ecs-agent.log*\nlog_group_name = ecsAgent-phizzard\nlog_stream_name = $INSTANCE_ID\ninitial_position = start_of_file\ndatetime_format = %b %d %H:%M:%S\nEOT\nsed -i -e \"s/region = us-east-1/region = eu-central-1/g\" /etc/awslogs/awscli.conf\n\nservice docker restart \u0026\u0026 start ecs \u0026\u0026 service awslogs start\n\n",
+                            "template": "#!/bin/bash\n\nyum install -y aws-cli \nyum update -y \nyum -y install ecs-init awslogs\necho ECS_CLUSTER=${cluster_name} \u003e\u003e /etc/ecs/ecs.config\necho ECS_LOGFILE=/log/ecs-agent.log \u003e\u003e /etc/ecs/ecs.config\n\nmkdir -p /var/log/ecs\nmkdir -p /var/awslogs/state\nmkdir -p /etc/awslogs\n\nINSTANCE_ID=$(curl 169.254.169.254/latest/meta-data/instance-id)\ncat\u003e/etc/awslogs/awslogs.conf\u003c\u003cEOT\n[general]\nstate_file = /var/awslogs/state/agent-state  \n\n[ecs_agent_log]\nfile = /var/log/ecs/ecs-agent.log*\nlog_group_name = ecsAgent-${cluster_name}\nlog_stream_name = $INSTANCE_ID\ninitial_position = start_of_file\ndatetime_format = %b %d %H:%M:%S\nEOT\nsed -i -e \"s/region = us-east-1/region = ${aws_region}/g\" /etc/awslogs/awscli.conf\n\nservice docker restart \u0026\u0026 start ecs \u0026\u0026 service awslogs start\n\n",
+                            "vars.%": "2",
+                            "vars.aws_region": "eu-central-1",
+                            "vars.cluster_name": "phizzard"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.template"
+                }
+            },
+            "depends_on": []
+        }
+    ]
+}

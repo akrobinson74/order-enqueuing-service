@@ -37,6 +37,7 @@ resource "aws_instance" "ops" {
   instance_type               = "t2.micro"
   key_name                    = "akr-key-pair1"
   monitoring                  = true
+  user_data = ""
 
   security_groups = [
     "sg-0b2ac6867f9311863",

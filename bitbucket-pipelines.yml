@@ -67,6 +67,7 @@ pipelines:
             - docker/app/build/config-prod.yml
             - docker/app/build/newrelic.jar
             - docker/app/build/newrelic.yml
+            - docker/app/build/wait-for-it.sh
       - step:
           name: Build Docker Image
           caches:

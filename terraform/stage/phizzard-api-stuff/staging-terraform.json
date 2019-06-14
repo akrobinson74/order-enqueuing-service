@@ -1,0 +1,413 @@
+{
+    "version": 3,
+    "terraform_version": "0.11.7",
+    "serial": 115,
+    "lineage": "8da52f21-4359-aec2-6d6c-79f7acb246e1",
+    "modules": [
+        {
+            "path": [
+                "root"
+            ],
+            "outputs": {},
+            "resources": {
+                "data.terraform_remote_state.ecs": {
+                    "type": "terraform_remote_state",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "2019-04-13 18:03:32.449949495 +0000 UTC",
+                        "attributes": {
+                            "backend": "s3",
+                            "config.%": "3",
+                            "config.bucket": "terraform-phizzard",
+                            "config.key": "aws/ecs/terraform.tfstate",
+                            "config.region": "eu-central-1",
+                            "ecs-cluster-id": "arn:aws:ecs:eu-central-1:806353235757:cluster/phizzard",
+                            "ecs-servicerole-arn": "arn:aws:iam::806353235757:role/phizzard-servicerole",
+                            "elb_security_group_id": "sg-1233087f",
+                            "environment": "default",
+                            "id": "2019-04-13 18:03:32.449949495 +0000 UTC",
+                            "workspace": "default"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.terraform"
+                },
+                "data.terraform_remote_state.lb": {
+                    "type": "terraform_remote_state",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "2019-04-13 18:03:32.371451857 +0000 UTC",
+                        "attributes": {
+                            "backend": "s3",
+                            "config.%": "3",
+                            "config.bucket": "terraform-phizzard",
+                            "config.key": "aws/lb/terraform.tfstate",
+                            "config.region": "eu-central-1",
+                            "environment": "default",
+                            "id": "2019-04-13 18:03:32.371451857 +0000 UTC",
+                            "lb_arn": "arn:aws:elasticloadbalancing:eu-central-1:806353235757:loadbalancer/app/phizzard-alb/51a3e0dc724427e6",
+                            "workspace": "default"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.terraform"
+                },
+                "data.terraform_remote_state.vpc": {
+                    "type": "terraform_remote_state",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "2019-04-13 18:03:32.501609542 +0000 UTC",
+                        "attributes": {
+                            "aws_region": "eu-central-1",
+                            "backend": "s3",
+                            "config.%": "3",
+                            "config.bucket": "terraform-phizzard",
+                            "config.key": "aws/vpc/terraform.tfstate",
+                            "config.region": "eu-central-1",
+                            "environment": "default",
+                            "id": "2019-04-13 18:03:32.501609542 +0000 UTC",
+                            "vpc_id": "vpc-a1314dca",
+                            "workspace": "default"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.terraform"
+                }
+            },
+            "depends_on": []
+        },
+        {
+            "path": [
+                "root",
+                "service"
+            ],
+            "outputs": {},
+            "resources": {
+                "aws_alb_listener_rule.service": {
+                    "type": "aws_alb_listener_rule",
+                    "depends_on": [
+                        "aws_alb_target_group.service",
+                        "data.aws_lb_listener.listener"
+                    ],
+                    "primary": {
+                        "id": "arn:aws:elasticloadbalancing:eu-central-1:806353235757:listener-rule/app/phizzard-alb/51a3e0dc724427e6/2110a28c8ede49dc/d29814bb0f0c6d0a",
+                        "attributes": {
+                            "action.#": "1",
+                            "action.0.authenticate_cognito.#": "0",
+                            "action.0.authenticate_oidc.#": "0",
+                            "action.0.fixed_response.#": "0",
+                            "action.0.order": "0",
+                            "action.0.redirect.#": "0",
+                            "action.0.target_group_arn": "arn:aws:elasticloadbalancing:eu-central-1:806353235757:targetgroup/staging-alb-tg/e0bfca340328f582",
+                            "action.0.type": "forward",
+                            "arn": "arn:aws:elasticloadbalancing:eu-central-1:806353235757:listener-rule/app/phizzard-alb/51a3e0dc724427e6/2110a28c8ede49dc/d29814bb0f0c6d0a",
+                            "condition.#": "1",
+                            "condition.2114627292.field": "host-header",
+                            "condition.2114627292.values.#": "1",
+                            "condition.2114627292.values.0": "staging.phizzard.app",
+                            "id": "arn:aws:elasticloadbalancing:eu-central-1:806353235757:listener-rule/app/phizzard-alb/51a3e0dc724427e6/2110a28c8ede49dc/d29814bb0f0c6d0a",
+                            "listener_arn": "arn:aws:elasticloadbalancing:eu-central-1:806353235757:listener/app/phizzard-alb/51a3e0dc724427e6/2110a28c8ede49dc",
+                            "priority": "100"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "module.service.provider.aws"
+                },
+                "aws_alb_target_group.service": {
+                    "type": "aws_alb_target_group",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "arn:aws:elasticloadbalancing:eu-central-1:806353235757:targetgroup/staging-alb-tg/e0bfca340328f582",
+                        "attributes": {
+                            "arn": "arn:aws:elasticloadbalancing:eu-central-1:806353235757:targetgroup/staging-alb-tg/e0bfca340328f582",
+                            "arn_suffix": "targetgroup/staging-alb-tg/e0bfca340328f582",
+                            "deregistration_delay": "300",
+                            "health_check.#": "1",
+                            "health_check.0.healthy_threshold": "3",
+                            "health_check.0.interval": "30",
+                            "health_check.0.matcher": "200",
+                            "health_check.0.path": "/health.php",
+                            "health_check.0.port": "traffic-port",
+                            "health_check.0.protocol": "HTTP",
+                            "health_check.0.timeout": "5",
+                            "health_check.0.unhealthy_threshold": "3",
+                            "id": "arn:aws:elasticloadbalancing:eu-central-1:806353235757:targetgroup/staging-alb-tg/e0bfca340328f582",
+                            "name": "staging-alb-tg",
+                            "port": "80",
+                            "protocol": "HTTP",
+                            "proxy_protocol_v2": "false",
+                            "slow_start": "0",
+                            "stickiness.#": "1",
+                            "stickiness.0.cookie_duration": "86400",
+                            "stickiness.0.enabled": "false",
+                            "stickiness.0.type": "lb_cookie",
+                            "tags.%": "0",
+                            "target_type": "instance",
+                            "vpc_id": "vpc-a1314dca"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "module.service.provider.aws"
+                },
+                "aws_cloudwatch_log_group.ecs_testapp": {
+                    "type": "aws_cloudwatch_log_group",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "ecs/staging/phizzardapp",
+                        "attributes": {
+                            "arn": "arn:aws:logs:eu-central-1:806353235757:log-group:ecs/staging/phizzardapp:*",
+                            "id": "ecs/staging/phizzardapp",
+                            "kms_key_id": "",
+                            "name": "ecs/staging/phizzardapp",
+                            "retention_in_days": "1",
+                            "tags.%": "0"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "module.service.provider.aws"
+                },
+                "aws_cloudwatch_log_group.ecs_testweb": {
+                    "type": "aws_cloudwatch_log_group",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "ecs/staging/phizzardweb",
+                        "attributes": {
+                            "arn": "arn:aws:logs:eu-central-1:806353235757:log-group:ecs/staging/phizzardweb:*",
+                            "id": "ecs/staging/phizzardweb",
+                            "kms_key_id": "",
+                            "name": "ecs/staging/phizzardweb",
+                            "retention_in_days": "1",
+                            "tags.%": "0"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "module.service.provider.aws"
+                },
+                "aws_ecs_service.service": {
+                    "type": "aws_ecs_service",
+                    "depends_on": [
+                        "aws_alb_target_group.service",
+                        "aws_ecs_task_definition.service"
+                    ],
+                    "primary": {
+                        "id": "arn:aws:ecs:eu-central-1:806353235757:service/phizzardapi_staging",
+                        "attributes": {
+                            "cluster": "arn:aws:ecs:eu-central-1:806353235757:cluster/phizzard",
+                            "deployment_controller.#": "1",
+                            "deployment_controller.0.type": "ECS",
+                            "deployment_maximum_percent": "200",
+                            "deployment_minimum_healthy_percent": "0",
+                            "desired_count": "2",
+                            "enable_ecs_managed_tags": "false",
+                            "health_check_grace_period_seconds": "0",
+                            "iam_role": "arn:aws:iam::806353235757:role/phizzard-servicerole",
+                            "id": "arn:aws:ecs:eu-central-1:806353235757:service/phizzardapi_staging",
+                            "launch_type": "EC2",
+                            "load_balancer.#": "1",
+                            "load_balancer.252656751.container_name": "web",
+                            "load_balancer.252656751.container_port": "80",
+                            "load_balancer.252656751.elb_name": "",
+                            "load_balancer.252656751.target_group_arn": "arn:aws:elasticloadbalancing:eu-central-1:806353235757:targetgroup/staging-alb-tg/e0bfca340328f582",
+                            "name": "phizzardapi_staging",
+                            "network_configuration.#": "0",
+                            "ordered_placement_strategy.#": "0",
+                            "placement_constraints.#": "0",
+                            "platform_version": "",
+                            "propagate_tags": "NONE",
+                            "scheduling_strategy": "REPLICA",
+                            "service_registries.#": "0",
+                            "tags.%": "0",
+                            "task_definition": "arn:aws:ecs:eu-central-1:806353235757:task-definition/phizzardapi_staging:122"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "module.service.provider.aws"
+                },
+                "aws_ecs_task_definition.service": {
+                    "type": "aws_ecs_task_definition",
+                    "depends_on": [
+                        "data.template_file.service"
+                    ],
+                    "primary": {
+                        "id": "phizzardapi_staging",
+                        "attributes": {
+                            "arn": "arn:aws:ecs:eu-central-1:806353235757:task-definition/phizzardapi_staging:122",
+                            "container_definitions": "[{\"cpu\":500,\"environment\":[{\"name\":\"CLOUDWATCH_AWS_REGION\",\"value\":\"eu-central-1\"},{\"name\":\"APP_ENV\",\"value\":\"staging\"},{\"name\":\"USER_DATABASE_URL\",\"value\":\"mysql://phizzardapi:xRQt8UsnrK@phizzardmaindbcluster.cluster-cgajsqx1zwav.eu-central-1.rds.amazonaws.com:3306/phizzard_api_staging\"},{\"name\":\"CLOUDWATCH_AWS_TOKEN\",\"value\":\"\"},{\"name\":\"AWS_S3_VERSION\",\"value\":\"latest\"},{\"name\":\"MAIN_DATABASE_URL\",\"value\":\"mysql://phizzardapi:xRQt8UsnrK@phizzardmaindbcluster.cluster-cgajsqx1zwav.eu-central-1.rds.amazonaws.com:3306/phizzard_api_staging\"},{\"name\":\"AWS_S3_API_DESCRIPTIONS_BUCKETNAME\",\"value\":\"phizzardimportimages\"},{\"name\":\"CLOUDWATCH_GROUP_NAME\",\"value\":\"ecs/staging/phizzard-api\"},{\"name\":\"AWS_S3_REGION\",\"value\":\"eu-central-1\"},{\"name\":\"CLOUDWATCH_STREAM_NAME\",\"value\":\"\"},{\"name\":\"AWS_S3_KEY\",\"value\":\"AKIAJDCRV2UPXHN26QIA\"},{\"name\":\"AWS_S3_IMAGES_BUCKETNAME\",\"value\":\"phizzardimportimages\"},{\"name\":\"ELASTICSEARCH_URL\",\"value\":\"https://search-search-hpxggu3ndtubx7szxue4pcxb7a.eu-west-1.es.amazonaws.com/\"},{\"name\":\"CLOUDWATCH_AWS_KEY\",\"value\":\"AKIAJXPGVEZS37NE53ZA\"},{\"name\":\"AWS_S3_SECRET\",\"value\":\"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\"},{\"name\":\"CLOUDWATCH_AWS_SECRET\",\"value\":\"IvWToFxgM285/yFbY0/m+xbTXOC1iUEFjZzlqSQc\"},{\"name\":\"AWS_S3_IMPORTFILES_BUCKETNAME\",\"value\":\"phizzardimport\"},{\"name\":\"REDIS_URL\",\"value\":\"redis://phizzardapi.zymkgj.0001.euc1.cache.amazonaws.com:6379\"}],\"essential\":true,\"image\":\"806353235757.dkr.ecr.eu-central-1.amazonaws.com/phizzardapp:e9796f3\",\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"ecs/staging/phizzardapp\",\"awslogs-region\":\"eu-central-1\",\"awslogs-stream-prefix\":\"e9796f3\"}},\"memoryReservation\":480,\"mountPoints\":[],\"name\":\"app\",\"portMappings\":[],\"volumesFrom\":[]},{\"cpu\":500,\"environment\":[],\"essential\":true,\"image\":\"806353235757.dkr.ecr.eu-central-1.amazonaws.com/phizzardweb:e9796f3\",\"links\":[\"app:app\"],\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"ecs/staging/phizzardweb\",\"awslogs-region\":\"eu-central-1\",\"awslogs-stream-prefix\":\"e9796f3\"}},\"memoryReservation\":480,\"mountPoints\":[],\"name\":\"web\",\"portMappings\":[{\"containerPort\":80,\"hostPort\":0,\"protocol\":\"tcp\"}],\"volumesFrom\":[]}]",
+                            "cpu": "",
+                            "execution_role_arn": "",
+                            "family": "phizzardapi_staging",
+                            "id": "phizzardapi_staging",
+                            "memory": "",
+                            "network_mode": "",
+                            "placement_constraints.#": "0",
+                            "requires_compatibilities.#": "0",
+                            "revision": "122",
+                            "tags.%": "0",
+                            "task_role_arn": "",
+                            "volume.#": "0"
+                        },
+                        "meta": {
+                            "schema_version": "1"
+                        },
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "module.service.provider.aws"
+                },
+                "data.aws_lb.test": {
+                    "type": "aws_lb",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "arn:aws:elasticloadbalancing:eu-central-1:806353235757:loadbalancer/app/phizzard-alb/51a3e0dc724427e6",
+                        "attributes": {
+                            "access_logs.#": "0",
+                            "arn": "arn:aws:elasticloadbalancing:eu-central-1:806353235757:loadbalancer/app/phizzard-alb/51a3e0dc724427e6",
+                            "arn_suffix": "app/phizzard-alb/51a3e0dc724427e6",
+                            "dns_name": "phizzard-alb-1556696151.eu-central-1.elb.amazonaws.com",
+                            "enable_deletion_protection": "false",
+                            "id": "arn:aws:elasticloadbalancing:eu-central-1:806353235757:loadbalancer/app/phizzard-alb/51a3e0dc724427e6",
+                            "idle_timeout": "60",
+                            "internal": "false",
+                            "load_balancer_type": "application",
+                            "name": "phizzard-alb",
+                            "security_groups.#": "1",
+                            "security_groups.2964555774": "sg-1233087f",
+                            "subnet_mapping.#": "0",
+                            "subnets.#": "3",
+                            "subnets.2834894757": "subnet-2d89fa60",
+                            "subnets.4174075323": "subnet-5c8ee821",
+                            "subnets.983063881": "subnet-120e2679",
+                            "tags.%": "1",
+                            "tags.Name": "phizzard.app ALB",
+                            "vpc_id": "vpc-a1314dca",
+                            "zone_id": "Z215JYRZR1TBD5"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "module.service.provider.aws"
+                },
+                "data.aws_lb_listener.listener": {
+                    "type": "aws_lb_listener",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "arn:aws:elasticloadbalancing:eu-central-1:806353235757:listener/app/phizzard-alb/51a3e0dc724427e6/2110a28c8ede49dc",
+                        "attributes": {
+                            "arn": "arn:aws:elasticloadbalancing:eu-central-1:806353235757:listener/app/phizzard-alb/51a3e0dc724427e6/2110a28c8ede49dc",
+                            "certificate_arn": "arn:aws:acm:eu-central-1:806353235757:certificate/57b6dfa7-6e88-48f9-b908-a4e0a6cf8c95",
+                            "default_action.#": "1",
+                            "default_action.0.authenticate_cognito.#": "0",
+                            "default_action.0.authenticate_oidc.#": "0",
+                            "default_action.0.fixed_response.#": "0",
+                            "default_action.0.order": "0",
+                            "default_action.0.redirect.#": "0",
+                            "default_action.0.target_group_arn": "arn:aws:elasticloadbalancing:eu-central-1:806353235757:targetgroup/default-tg/4726f28e6be49374",
+                            "default_action.0.type": "forward",
+                            "id": "arn:aws:elasticloadbalancing:eu-central-1:806353235757:listener/app/phizzard-alb/51a3e0dc724427e6/2110a28c8ede49dc",
+                            "load_balancer_arn": "arn:aws:elasticloadbalancing:eu-central-1:806353235757:loadbalancer/app/phizzard-alb/51a3e0dc724427e6",
+                            "port": "443",
+                            "protocol": "HTTPS",
+                            "ssl_policy": "ELBSecurityPolicy-2015-05"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "module.service.provider.aws"
+                },
+                "data.aws_rds_cluster.clusterName": {
+                    "type": "aws_rds_cluster",
+                    "depends_on": [],
+                    "primary": {
+                        "id": "phizzardmaindbcluster",
+                        "attributes": {
+                            "arn": "arn:aws:rds:eu-central-1:806353235757:cluster:phizzardmaindbcluster",
+                            "availability_zones.#": "3",
+                            "availability_zones.1126047633": "eu-central-1a",
+                            "availability_zones.2903539389": "eu-central-1c",
+                            "availability_zones.3658960427": "eu-central-1b",
+                            "backup_retention_period": "1",
+                            "cluster_identifier": "phizzardmaindbcluster",
+                            "cluster_members.#": "1",
+                            "cluster_members.1272927231": "phizzardmaindb",
+                            "cluster_resource_id": "cluster-2RGC7XMWFENHOQ5CZA4673PRRQ",
+                            "database_name": "phizzardmaindb",
+                            "db_cluster_parameter_group_name": "default.aurora-mysql5.7",
+                            "db_subnet_group_name": "default-vpc-a1314dca",
+                            "enabled_cloudwatch_logs_exports.#": "2",
+                            "enabled_cloudwatch_logs_exports.0": "error",
+                            "enabled_cloudwatch_logs_exports.1": "slowquery",
+                            "endpoint": "phizzardmaindbcluster.cluster-cgajsqx1zwav.eu-central-1.rds.amazonaws.com",
+                            "engine": "aurora-mysql",
+                            "engine_version": "5.7.12",
+                            "iam_database_authentication_enabled": "false",
+                            "iam_roles.#": "0",
+                            "id": "phizzardmaindbcluster",
+                            "kms_key_id": "arn:aws:kms:eu-central-1:806353235757:key/e6c9f588-73da-4502-ac6c-4baa3382f52c",
+                            "master_username": "phizzardapi",
+                            "port": "3306",
+                            "preferred_backup_window": "00:18-00:48",
+                            "preferred_maintenance_window": "tue:23:41-wed:00:11",
+                            "reader_endpoint": "phizzardmaindbcluster.cluster-ro-cgajsqx1zwav.eu-central-1.rds.amazonaws.com",
+                            "replication_source_identifier": "",
+                            "storage_encrypted": "true",
+                            "tags.%": "0",
+                            "vpc_security_group_ids.#": "1",
+                            "vpc_security_group_ids.1489173385": "sg-64959f09"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "module.service.provider.aws"
+                },
+                "data.template_file.service": {
+                    "type": "template_file",
+                    "depends_on": [
+                        "data.aws_rds_cluster.clusterName"
+                    ],
+                    "primary": {
+                        "id": "f061a24d628d6fd3e382df0c4e112f82307f12285c8cdab263f850eddb4fed16",
+                        "attributes": {
+                            "id": "f061a24d628d6fd3e382df0c4e112f82307f12285c8cdab263f850eddb4fed16",
+                            "rendered": "[\n    {\n      \"name\": \"app\",\n      \"image\": \"806353235757.dkr.ecr.eu-central-1.amazonaws.com/phizzardapp:e9796f3\",\n      \"essential\": true,\n      \"memoryReservation\": 480,\n      \"cpu\": 500,\n      \"environment\": [\n        {\n          \"name\": \"MAIN_DATABASE_URL\",\n          \"value\": \"mysql://phizzardapi:xRQt8UsnrK@phizzardmaindbcluster.cluster-cgajsqx1zwav.eu-central-1.rds.amazonaws.com:3306/phizzard_api_staging\"\n        },\n        {\n          \"name\": \"USER_DATABASE_URL\",\n          \"value\": \"mysql://phizzardapi:xRQt8UsnrK@phizzardmaindbcluster.cluster-cgajsqx1zwav.eu-central-1.rds.amazonaws.com:3306/phizzard_api_staging\"\n        },\n        {\n          \"name\": \"APP_ENV\",\n          \"value\": \"staging\"\n        },\n        {\n          \"name\": \"ELASTICSEARCH_URL\",\n          \"value\": \"https://search-search-hpxggu3ndtubx7szxue4pcxb7a.eu-west-1.es.amazonaws.com/\"\n        },\n        {\n          \"name\": \"CLOUDWATCH_AWS_KEY\",\n          \"value\": \"AKIAJXPGVEZS37NE53ZA\" \n        },\n        {\n          \"name\": \"CLOUDWATCH_AWS_REGION\",\n          \"value\": \"eu-central-1\" \n        },\n        {\n          \"name\": \"CLOUDWATCH_AWS_SECRET\",\n          \"value\": \"IvWToFxgM285/yFbY0/m+xbTXOC1iUEFjZzlqSQc\" \n        },\n        {\n          \"name\": \"CLOUDWATCH_AWS_TOKEN\",\n          \"value\": \"\" \n        },\n        {\n          \"name\": \"CLOUDWATCH_GROUP_NAME\",\n          \"value\": \"ecs/staging/phizzard-api\"\n        },\n        {\n          \"name\": \"CLOUDWATCH_STREAM_NAME\",\n          \"value\": \"\" \n        },\n        {\n          \"name\": \"REDIS_URL\",\n          \"value\": \"redis://phizzardapi.zymkgj.0001.euc1.cache.amazonaws.com:6379\" \n        },\n        {\n          \"name\": \"AWS_S3_KEY\",\n          \"value\": \"AKIAJDCRV2UPXHN26QIA\"\n        },\n        {\n          \"name\": \"AWS_S3_SECRET\",\n          \"value\": \"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\"\n        },\n        {\n          \"name\": \"AWS_S3_REGION\",\n          \"value\": \"eu-central-1\"\n        },\n        {\n          \"name\": \"AWS_S3_VERSION\",\n          \"value\": \"latest\"\n        },\n        {\n          \"name\": \"AWS_S3_IMPORTFILES_BUCKETNAME\",\n          \"value\": \"phizzardimport\"\n        },\n        {\n          \"name\": \"AWS_S3_IMAGES_BUCKETNAME\",\n          \"value\": \"phizzardimportimages\"\n        },\n        {\n          \"name\": \"AWS_S3_API_DESCRIPTIONS_BUCKETNAME\",\n          \"value\": \"phizzardimportimages\"\n        }\n      ],\n      \"logConfiguration\": { \n        \"logDriver\": \"awslogs\",\n        \"options\": {\n          \"awslogs-group\": \"ecs/staging/phizzardapp\",\n          \"awslogs-region\": \"eu-central-1\",\n          \"awslogs-stream-prefix\": \"e9796f3\"\n        }\n      }\n    },\n    {\n      \"name\": \"web\",\n      \"image\": \"806353235757.dkr.ecr.eu-central-1.amazonaws.com/phizzardweb:e9796f3\",\n      \"portMappings\": [\n        {\n          \"hostPort\": 0,\n          \"protocol\": \"tcp\",\n          \"containerPort\": 80\n        }\n      ],\n      \"essential\": true,\n      \"memoryReservation\": 480,\n      \"cpu\": 500,\n      \"logConfiguration\": { \n        \"logDriver\": \"awslogs\",\n        \"options\": {\n          \"awslogs-group\": \"ecs/staging/phizzardweb\",\n          \"awslogs-region\": \"eu-central-1\",\n          \"awslogs-stream-prefix\": \"e9796f3\"\n        }\n      },\n      \"links\": [\n        \"app:app\"\n      ]\n    }\n]\n",
+                            "template": "[\n    {\n      \"name\": \"app\",\n      \"image\": \"806353235757.dkr.ecr.eu-central-1.amazonaws.com/phizzardapp:${version}\",\n      \"essential\": true,\n      \"memoryReservation\": 480,\n      \"cpu\": 500,\n      \"environment\": [\n        {\n          \"name\": \"MAIN_DATABASE_URL\",\n          \"value\": \"mysql://${username}:${password}@${endpoint}:${port}/${dbname}\"\n        },\n        {\n          \"name\": \"USER_DATABASE_URL\",\n          \"value\": \"mysql://${username}:${password}@${endpoint}:${port}/${dbname}\"\n        },\n        {\n          \"name\": \"APP_ENV\",\n          \"value\": \"${env}\"\n        },\n        {\n          \"name\": \"ELASTICSEARCH_URL\",\n          \"value\": \"https://search-search-hpxggu3ndtubx7szxue4pcxb7a.eu-west-1.es.amazonaws.com/\"\n        },\n        {\n          \"name\": \"CLOUDWATCH_AWS_KEY\",\n          \"value\": \"AKIAJXPGVEZS37NE53ZA\" \n        },\n        {\n          \"name\": \"CLOUDWATCH_AWS_REGION\",\n          \"value\": \"${region}\" \n        },\n        {\n          \"name\": \"CLOUDWATCH_AWS_SECRET\",\n          \"value\": \"IvWToFxgM285/yFbY0/m+xbTXOC1iUEFjZzlqSQc\" \n        },\n        {\n          \"name\": \"CLOUDWATCH_AWS_TOKEN\",\n          \"value\": \"\" \n        },\n        {\n          \"name\": \"CLOUDWATCH_GROUP_NAME\",\n          \"value\": \"ecs/${env}/phizzard-api\"\n        },\n        {\n          \"name\": \"CLOUDWATCH_STREAM_NAME\",\n          \"value\": \"\" \n        },\n        {\n          \"name\": \"REDIS_URL\",\n          \"value\": \"redis://phizzardapi.zymkgj.0001.euc1.cache.amazonaws.com:6379\" \n        },\n        {\n          \"name\": \"AWS_S3_KEY\",\n          \"value\": \"AKIAJDCRV2UPXHN26QIA\"\n        },\n        {\n          \"name\": \"AWS_S3_SECRET\",\n          \"value\": \"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\"\n        },\n        {\n          \"name\": \"AWS_S3_REGION\",\n          \"value\": \"eu-central-1\"\n        },\n        {\n          \"name\": \"AWS_S3_VERSION\",\n          \"value\": \"latest\"\n        },\n        {\n          \"name\": \"AWS_S3_IMPORTFILES_BUCKETNAME\",\n          \"value\": \"phizzardimport\"\n        },\n        {\n          \"name\": \"AWS_S3_IMAGES_BUCKETNAME\",\n          \"value\": \"phizzardimportimages\"\n        },\n        {\n          \"name\": \"AWS_S3_API_DESCRIPTIONS_BUCKETNAME\",\n          \"value\": \"phizzardimportimages\"\n        }\n      ],\n      \"logConfiguration\": { \n        \"logDriver\": \"awslogs\",\n        \"options\": {\n          \"awslogs-group\": \"ecs/${env}/phizzardapp\",\n          \"awslogs-region\": \"${region}\",\n          \"awslogs-stream-prefix\": \"${version}\"\n        }\n      }\n    },\n    {\n      \"name\": \"web\",\n      \"image\": \"806353235757.dkr.ecr.eu-central-1.amazonaws.com/phizzardweb:${version}\",\n      \"portMappings\": [\n        {\n          \"hostPort\": 0,\n          \"protocol\": \"tcp\",\n          \"containerPort\": ${containerport}\n        }\n      ],\n      \"essential\": true,\n      \"memoryReservation\": 480,\n      \"cpu\": 500,\n      \"logConfiguration\": { \n        \"logDriver\": \"awslogs\",\n        \"options\": {\n          \"awslogs-group\": \"ecs/${env}/phizzardweb\",\n          \"awslogs-region\": \"${region}\",\n          \"awslogs-stream-prefix\": \"${version}\"\n        }\n      },\n      \"links\": [\n        \"app:app\"\n      ]\n    }\n]\n",
+                            "vars.%": "9",
+                            "vars.containerport": "80",
+                            "vars.dbname": "phizzard_api_staging",
+                            "vars.endpoint": "phizzardmaindbcluster.cluster-cgajsqx1zwav.eu-central-1.rds.amazonaws.com",
+                            "vars.env": "staging",
+                            "vars.password": "xRQt8UsnrK",
+                            "vars.port": "3306",
+                            "vars.region": "eu-central-1",
+                            "vars.username": "phizzardapi",
+                            "vars.version": "e9796f3"
+                        },
+                        "meta": {},
+                        "tainted": false
+                    },
+                    "deposed": [],
+                    "provider": "provider.template"
+                }
+            },
+            "depends_on": []
+        }
+    ]
+}

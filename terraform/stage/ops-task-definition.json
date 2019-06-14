@@ -1,0 +1,30 @@
+[
+  {
+    "cpu": 128,
+    "environment": [
+      {
+        "name": "MONGO_URL",
+        "value": "mongodb+srv://phizzardTestDBUser:b55dd2655323fcbcb9df06c55af4bc51676964d2c294e0ac8628e1ac9d99060d@orders0-mowjm.mongodb.net/test_orders?ssl=true&sslInvalidHostNameAllowed=true&streamType=netty"
+      },
+      {
+        "name": "SQS_URL",
+        "value": "https://sqs.eu-central-1.amazonaws.com/806353235757/test-orders"
+      },
+      {
+        "name": "PMA_ABSOLUTE_URI",
+        "value": "${hostname}"
+      }
+    ],
+    "essential": true,
+    "image": "806353235757.dkr.ecr.eu-central-1.amazonaws.com/order-enqueuing-service:latest",
+    "memory": 128,
+    "name": "order-enqueuing-service",
+    "portMappings": [
+      {
+        "hostPort": 9080,
+        "containerPort": 9080,
+        "protocol": "tcp"
+      }
+    ]
+  }
+]

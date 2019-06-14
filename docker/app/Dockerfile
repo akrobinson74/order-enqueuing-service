@@ -1,6 +1,6 @@
-FROM adoptopenjdk/openjdk11:jdk-11.0.3.7
+FROM adoptopenjdk/openjdk11:11.0.3-jdk-slim-stretch
 
-WORKDIR /deployments
+WORKDIR /workdir
 
 # Application
 COPY build/wait-for-it.sh .

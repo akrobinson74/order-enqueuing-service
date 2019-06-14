@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:11.0.3-jdk-slim-stretch
+FROM adoptopenjdk/openjdk11:slim
 
 WORKDIR /workdir
 

@@ -42,19 +42,6 @@ data "aws_ami" "amazon-linux" {
   owners = ["amazon"]
 }
 
-//data "aws_ami" "ubuntu" {
-//  most_recent = true
-//
-//  filter {
-//    name = "name"
-//    values = [
-//      "ubuntu/images/hvm-ssd/ubuntu-bionic-*"]
-//  }
-//
-//  owners = [
-//    "099720109477"]
-//}
-
 data "template_file" "user_data_oes" {
   template = "${file("${path.module}/user-data-amazon-linux.sh")}"
 

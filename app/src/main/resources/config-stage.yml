@@ -4,6 +4,7 @@ cors:
     - Cache-Control
     - Content-Length
     - Content-Range
+    - Content-Type
     - DNT
     - If-Modified-Since
     - User-Agent

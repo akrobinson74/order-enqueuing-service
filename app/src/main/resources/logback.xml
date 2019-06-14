@@ -16,6 +16,16 @@
         </encoder>
     </appender>
 
+    <logger name="io.netty.handler.ssl.SslHandler" level="WARN">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="LOG" />
+    </logger>
+
+    <logger name="org.mongodb.driver.connection" level="WARN">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="LOG" />
+    </logger>
+
     <logger name="org.mongodb.driver.cluster" level="WARN">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="LOG" />

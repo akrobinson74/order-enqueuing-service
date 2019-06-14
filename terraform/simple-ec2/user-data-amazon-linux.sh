@@ -23,35 +23,8 @@ datetime_format = %b %d %H:%M:%S
 EOT
 sed -i -e "s/region = us-east-1/region = ${aws_region}/g" /etc/awslogs/awscli.conf
 
-## install java 11 lts
-#java_base_version="11"
-#java_sub_version="0"
-#java_base_build="3"
-#
-#java_version=$java_base_version + "u$java_sub_version"
-#java_build="b$java_base_build"
-#java_version_with_build="$java_version-$java_build"
-#
-#sudo yum install -y wget
-#wget --no-cookies --header "Cookie: gpw_e24=xxx; oraclelicense=accept-securebackup-cookie;" "http://download.oracle.com/otn-pub/java/jdk/11u0-b3/jdk-11u0-b3-linux-x64.rpm"
-#sudo rpm -i jdk-11.0.3_linux-x64.rpm
-
 ## install java 8
 sudo yum install -y java-1.8.0-openjdk
-
-## install logstash
-sudo rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
-sudo cat>/etc/yum.repos.d/logstash.repo<<EOT
-[logstash-7.x]
-name=Elastic repository for 7.x packages
-baseurl=https://artifacts.elastic.co/packages/7.x/yum
-gpgcheck=1
-gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
-enabled=1
-autorefresh=1
-type=rpm-md
-EOT
-sudo yum -y install logstash
 
 # script to pull image and start docker container
 cat>~/service-restart.sh<<"EOT"

@@ -2,8 +2,8 @@ version: '3.7'
 
 services:
   elasticmq:
+    build: elasticmq
     container_name: elasticmq
-    image: softwaremill/elasticmq:latest
     networks:
       - oes
     ports:

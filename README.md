@@ -69,16 +69,27 @@ appropriate binary for your platform and then install.
 
 ## How to run the application
 
+### From IntelliJ
+
+Start the elasticmq and mongo containers as follows:
+```
+$ cd $PROJECT_ROOT
+$ make compose.deps.up
+```
+
 ### From the terminal/command-line
 
-Go to the project's parent directory and run:
+**Under construction - Not Working Presently**
+
+~~Go to the project's parent directory and run:~~
 ```
 $ cd $PROJECT_ROOT
 $ make compose.service.up
 ```
 
-Conversely, ```$ make compose.service.down``` will shutdown the service and its
-accompanying containers.
+
+~~Conversely, ```$ make compose.service.down``` will shutdown the service and its
+accompanying containers.~~
 
 ## Build and Deployment
 

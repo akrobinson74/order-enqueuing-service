@@ -24,7 +24,7 @@ object Versions {
 
     const val ktlint: String = "0.29.0" // available: "0.30.0"
 
-    const val com_newrelic_agent_java: String = "4.10.0" // available: "4.11.0"
+    const val com_newrelic_agent_java: String = "5.1.1" // available: "4.11.0"
 
     const val mockito_kotlin: String = "2.1.0" 
 

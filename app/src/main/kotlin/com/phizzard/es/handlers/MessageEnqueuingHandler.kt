@@ -57,7 +57,7 @@ class MessageEnqueuingHandler(
                 routingContext.response()
                     .setStatusCode(SC_CREATED)
                     .putHeader(LOCATION_HEADER, "$GET_ORDER_ENDPOINT/$mongoId")
-                    .end()
+                    .end(OrderCreationResponse(mongoId).asJsonString())
             }
     }
 
@@ -66,4 +66,5 @@ class MessageEnqueuingHandler(
     }
 }
 
+data class OrderCreationResponse(val orderId: String)
 data class OrderMessage(val mongoId: String)

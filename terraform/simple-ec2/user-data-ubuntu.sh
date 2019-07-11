@@ -67,5 +67,5 @@ docker run \
 $ecr_url
 EOT
 
-chmod 755 /tmp/startup-script/service-restart.sh
+chmod 755 /tmp/service-restart.sh
 cd /tmp/ && ./service-restart.sh

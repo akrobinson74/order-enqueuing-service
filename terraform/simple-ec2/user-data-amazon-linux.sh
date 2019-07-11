@@ -6,28 +6,12 @@ sudo yum -y install awslogs docker
 sudo usermod -a -G docker ec2-user
 sudo services docker start
 
-mkdir -p /var/awslogs/state
-mkdir -p /etc/awslogs
-
-INSTANCE_ID=$(curl 169.254.169.254/latest/meta-data/instance-id)
-cat>/etc/awslogs/awslogs.conf<<EOT
-[general]
-state_file = /var/awslogs/state/agent-state
-
-[ecs_agent_log]
-file = /var/log/ecs/ecs-agent.log*
-log_group_name = ecsAgent-${cluster_name}
-log_stream_name = $INSTANCE_ID
-initial_position = start_of_file
-datetime_format = %b %d %H:%M:%S
-EOT
-sed -i -e "s/region = us-east-1/region = ${aws_region}/g" /etc/awslogs/awscli.conf
-
 ## install java 8
 sudo yum install -y java-1.8.0-openjdk
 
 # script to pull image and start docker container
-cat>~/service-restart.sh<<"EOT"
+sudo mdkir -p /tmp/startup-script/
+script=$(cat << "EOT" > /tmp/startup-script/service-restart.sh
 #!/usr/bin/env bash
 
 export AWS_ACCESS_KEY_ID="${aws_key}"
@@ -61,7 +45,11 @@ docker run \
 -d \
 $ecr_url
 EOT
+)
 
-chmod 755 ~/service-restart.sh
-#sudo chown ec2-user ~/service-restart.sh
-cd && ./service-restart.sh
+echo "$script"
+sudo echo "$script" > ~/service-restart.sh
+sudo cat "$script" > /tmp/startup-script/service-restart.sh
+
+chmod 755 /tmp/startup-script/service-restart.sh
+cd /tmp && ./startup-script/service-restart.sh

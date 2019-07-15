@@ -6,6 +6,7 @@ terraform {
   }
 }
 
+//variable "app_name" {}
 variable "aws_access_key_id" {}
 variable "aws_region" {
   default = "eu-central-1"
@@ -42,23 +43,11 @@ data "aws_ami" "amazon-linux" {
   owners = ["amazon"]
 }
 
-//data "aws_ami" "ubuntu" {
-//  most_recent = true
-//
-//  filter {
-//    name = "name"
-//    values = [
-//      "ubuntu/images/hvm-ssd/ubuntu-bionic-*"]
-//  }
-//
-//  owners = [
-//    "099720109477"]
-//}
-
 data "template_file" "user_data_oes" {
   template = "${file("${path.module}/user-data-amazon-linux.sh")}"
 
   vars = {
+    app_name = "OrderEnqueuingService"
     aws_key = "${var.aws_access_key_id}"
     aws_region = "${var.aws_region}"
     aws_secret = "${var.aws_secret_access_key}"
@@ -68,6 +57,7 @@ data "template_file" "user_data_oes" {
     inbound_port = "${var.inbound_port}"
     nr_account_id = "${var.nr_account_id}"
     nr_license_key = "${var.nr_license_key}"
+    project = "order-enqueuing-service"
     service = "${var.service}"
   }
 }
@@ -76,6 +66,7 @@ data "template_file" "user_data_ops" {
   template = "${file("${path.module}/user-data-amazon-linux.sh")}"
 
   vars = {
+    app_name = "OrderProcessingService"
     aws_key = "${var.aws_access_key_id}"
     aws_region = "${var.aws_region}"
     aws_secret = "${var.aws_secret_access_key}"
@@ -85,6 +76,7 @@ data "template_file" "user_data_ops" {
     inbound_port = "443"
     nr_account_id = "${var.nr_account_id}"
     nr_license_key = "${var.nr_license_key}"
+    project = "order-processing-service"
     service = "ops"
   }
 }
@@ -97,6 +89,11 @@ resource "aws_instance" "oes" {
   monitoring = true
   user_data = "${data.template_file.user_data_oes.rendered}"
 
+//  provisioner "file" {
+//    source = "interp.sh"
+//    destination = "~ec2-user/restart-service.sh"
+//  }
+
   security_groups = [
     "sg-0b2ac6867f9311863",
   ]
@@ -108,29 +105,29 @@ resource "aws_instance" "oes" {
   }
 }
 
-resource "aws_instance" "ops" {
-  ami = "${data.aws_ami.amazon-linux.id}"
-  associate_public_ip_address = true
-  instance_type = "t2.micro"
-  key_name = "akr-key-pair1"
-  monitoring = true
-  user_data = "${data.template_file.user_data_ops.rendered}"
-
-  security_groups = [
-    "sg-0b2ac6867f9311863",
-  ]
-
-  subnet_id = "subnet-a904c8d2"
-
-  tags = {
-    Name = "ops-staging"
-  }
-}
+//resource "aws_instance" "ops" {
+//  ami = "${data.aws_ami.amazon-linux.id}"
+//  associate_public_ip_address = true
+//  instance_type = "t2.micro"
+//  key_name = "akr-key-pair1"
+//  monitoring = true
+//  user_data = "${data.template_file.user_data_ops.rendered}"
+//
+//  security_groups = [
+//    "sg-0b2ac6867f9311863",
+//  ]
+//
+//  subnet_id = "subnet-a904c8d2"
+//
+//  tags = {
+//    Name = "ops-staging"
+//  }
+//}
 
 output "oes-public-ip" {
   value = "${aws_instance.oes.public_ip}"
 }
 
-output "ops-public-ip" {
-  value = "${aws_instance.ops.public_ip}"
-}
+//output "ops-public-ip" {
+//  value = "${aws_instance.ops.public_ip}"
+//}

@@ -1,11 +1,12 @@
 terraform {
   backend "s3" {
-    bucket = "kotlin-terraform-stage"
-    key = "orderservices/terraform.tfstate"
+    bucket = "kotlin-terraform"
+    key = "stage/orderservices/terraform.tfstate"
     region = "eu-central-1"
   }
 }
 
+//variable "app_name" {}
 variable "aws_access_key_id" {}
 variable "aws_region" {
   default = "eu-central-1"
@@ -35,17 +36,20 @@ data "aws_ami" "amazon-linux" {
   most_recent = true
 
   filter {
-    name   = "name"
-    values = ["amzn-ami-*-ecs-optimized"]
+    name = "name"
+    values = [
+      "amzn-ami-*-ecs-optimized"]
   }
 
-  owners = ["amazon"]
+  owners = [
+    "amazon"]
 }
 
 data "template_file" "user_data_oes" {
   template = "${file("${path.module}/user-data-amazon-linux.sh")}"
 
   vars = {
+    app_name = "OrderEnqueuingService"
     aws_key = "${var.aws_access_key_id}"
     aws_region = "${var.aws_region}"
     aws_secret = "${var.aws_secret_access_key}"
@@ -55,6 +59,7 @@ data "template_file" "user_data_oes" {
     inbound_port = "${var.inbound_port}"
     nr_account_id = "${var.nr_account_id}"
     nr_license_key = "${var.nr_license_key}"
+    project = "order-enqueuing-service"
     service = "${var.service}"
   }
 }
@@ -63,6 +68,7 @@ data "template_file" "user_data_ops" {
   template = "${file("${path.module}/user-data-amazon-linux.sh")}"
 
   vars = {
+    app_name = "OrderProcessingService"
     aws_key = "${var.aws_access_key_id}"
     aws_region = "${var.aws_region}"
     aws_secret = "${var.aws_secret_access_key}"
@@ -72,6 +78,7 @@ data "template_file" "user_data_ops" {
     inbound_port = "443"
     nr_account_id = "${var.nr_account_id}"
     nr_license_key = "${var.nr_license_key}"
+    project = "order-processing-service"
     service = "ops"
   }
 }

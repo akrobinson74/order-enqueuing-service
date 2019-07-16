@@ -2,32 +2,16 @@
 
 sudo yum install -y aws-cli
 sudo yum update -y
-sudo yum -y install awslogs docker
+sudo yum -y install docker
+
 sudo usermod -a -G docker ec2-user
 sudo services docker start
-
-mkdir -p /var/awslogs/state
-mkdir -p /etc/awslogs
-
-INSTANCE_ID=$(curl 169.254.169.254/latest/meta-data/instance-id)
-cat>/etc/awslogs/awslogs.conf<<EOT
-[general]
-state_file = /var/awslogs/state/agent-state
-
-[ecs_agent_log]
-file = /var/log/ecs/ecs-agent.log*
-log_group_name = ecsAgent-${cluster_name}
-log_stream_name = $INSTANCE_ID
-initial_position = start_of_file
-datetime_format = %b %d %H:%M:%S
-EOT
-sed -i -e "s/region = us-east-1/region = ${aws_region}/g" /etc/awslogs/awscli.conf
 
 ## install java 8
 sudo yum install -y java-1.8.0-openjdk
 
 # script to pull image and start docker container
-cat>$HOME/service-restart.sh<<EOT
+cat>/service-restart.sh<<EOT
 #!/usr/bin/env bash
 
 export AWS_ACCESS_KEY_ID="${aws_key}"
@@ -49,10 +33,11 @@ docker run \\
     -e NEW_RELIC_LICENSE_KEY="${nr_license_key}" \\
     -e ENV=${deployment_tier} \\
     --name=${service} \\
-    -p ${inbound_port}:${container_port} \\11
+    -p ${inbound_port}:${container_port} \\
     -d \$ecr_url
 
 EOT
 
-sudo chmod 755 $HOME/service-restart.sh
-cd $HOME && ./service-restart.sh
+cd /
+chmod 755 service-restart.sh
+./service-restart.sh

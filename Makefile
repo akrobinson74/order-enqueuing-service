@@ -41,7 +41,8 @@ ecr:
 
 # Tags and push "stage" image to ECS registry
 release: build-docker
-	docker tag $(DOCKERREPO):stage $(DOCKERREPO):$(VERSION)
+	docker tag $(DOCKERREPO):latest $(DOCKERREPO):$(VERSION)
+	docker tag $(DOCKERREPO):latest $(DOCKERREPO):stage
 	docker push $(DOCKERREPO):$(VERSION)
 	docker push $(DOCKERREPO):stage
 

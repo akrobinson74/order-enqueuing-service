@@ -75,6 +75,7 @@ data "template_file" "user_data_ops" {
     cluster_name = "${var.cluster_name}"
     container_port = "9081"
     deployment_tier = "${var.deployment_tier}"
+    inbound_port = "${var.inbound_port}"
     nr_account_id = "${var.nr_account_id}"
     nr_license_key = "${var.nr_license_key}"
     project = "order-processing-service"

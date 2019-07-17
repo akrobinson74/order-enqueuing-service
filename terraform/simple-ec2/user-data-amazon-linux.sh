@@ -17,7 +17,7 @@ cat>/service-restart.sh<<EOT
 export AWS_ACCESS_KEY_ID="${aws_key}"
 export AWS_SECRET_ACCESS_KEY="${aws_secret}"
 
-ecr_url="806353235757.dkr.ecr.eu-central-1.amazonaws.com/${project}:latest"
+ecr_url="806353235757.dkr.ecr.eu-central-1.amazonaws.com/${project}:${deployment_tier}"
 
 eval \$(aws ecr get-login --region eu-central-1 --no-include-email)
 docker pull \$ecr_url

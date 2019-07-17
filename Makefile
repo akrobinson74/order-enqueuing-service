@@ -39,11 +39,11 @@ compose.service.down:
 ecr:
 	eval $(shell aws ecr get-login --region eu-central-1 --no-include-email)
 
-# Tags and push "latest" image to ECS registry
+# Tags and push "stage" image to ECS registry
 release: build-docker
-	docker tag $(DOCKERREPO):latest $(DOCKERREPO):$(VERSION)
+	docker tag $(DOCKERREPO):stage $(DOCKERREPO):$(VERSION)
 	docker push $(DOCKERREPO):$(VERSION)
-	docker push $(DOCKERREPO):latest
+	docker push $(DOCKERREPO):stage
 
 rollout-dev:
 	cd terraform/states/dev && terraform init -upgrade && terraform apply -auto-approve -var 'version=$(VERSION)'

@@ -20,7 +20,7 @@ class OrderRetrievalHandler(val mongoClient: MongoClient) {
             ?.let {
                 mongoClient.findOne(ORDERS_COLLECTION_NAME, it.getFindByIdQuery(), NULL_QUERY_PROJECTION) { result ->
                     result.succeeded()
-                        .takeIf { it }
+                        .takeIf { it && result.result() != null }
                         ?.let {
                             context.response()
                                 .setStatusCode(SC_OK)

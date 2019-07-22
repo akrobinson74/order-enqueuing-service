@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket = "kotlin-terraform"
-    key = "stage/orderservices/terraform.tfstate"
+    key = "dev/orderservices/terraform.tfstate"
     region = "eu-central-1"
   }
 }
@@ -16,7 +16,7 @@ variable "cluster_name" {
   default = "order-services"
 }
 variable "deployment_tier" {
-  default = "stage"
+  default = "dev"
 }
 variable "inbound_port" {
   default = 80
@@ -93,14 +93,16 @@ resource "aws_security_group" "order_svcs" {
   vpc_id = "vpc-a1314dca"
 
   egress {
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [
+      "0.0.0.0/0"]
     from_port = 0
     protocol = "-1"
     to_port = 0
   }
 
   ingress {
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [
+      "0.0.0.0/0"]
     from_port = 22
     protocol = "tcp"
     to_port = 22
@@ -140,7 +142,7 @@ resource "aws_instance" "oes" {
   subnet_id = "subnet-120e2679"
 
   tags = {
-    Name = "oes-staging"
+    Name = "oes-${var.deployment_tier}"
   }
 }
 
@@ -159,21 +161,23 @@ resource "aws_instance" "ops" {
   subnet_id = "subnet-120e2679"
 
   tags = {
-    Name = "ops-staging"
+    Name = "ops-${var.deployment_tier}"
   }
 }
 
 resource "aws_route53_record" "oes" {
-  name = "oes-${var.deployment_tier}.phizzard.app"
-  records = ["${aws_instance.oes.public_ip}"]
+  name = "oes${var.deployment_tier == "prod" ? "" : "-${var.deployment_tier}"}.phizzard.app"
+  records = [
+    "${aws_instance.oes.public_ip}"]
   ttl = 300
   type = "A"
   zone_id = "${var.route_53_zone_id}"
 }
 
 resource "aws_route53_record" "ops" {
-  name = "ops-${var.deployment_tier}.phizzard.app"
-  records = ["${aws_instance.ops.public_ip}"]
+  name = "ops${var.deployment_tier == "prod" ? "" : "-${var.deployment_tier}"}.phizzard.app"
+  records = [
+    "${aws_instance.ops.public_ip}"]
   ttl = 300
   type = "A"
   zone_id = "${var.route_53_zone_id}"

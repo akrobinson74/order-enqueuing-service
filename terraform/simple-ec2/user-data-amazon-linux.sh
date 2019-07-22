@@ -38,7 +38,7 @@ output {
     if [type]=="logback" {
          elasticsearch {
              hosts => [ "https://search-search-hpxggu3ndtubx7szxue4pcxb7a.eu-west-1.es.amazonaws.com:443" ]
-             index => "${service}-logback-%{+YYYY.MM.dd}"
+             index => "${service}-logback-%%{+YYYY.MM.dd}"
         }
     }
 }

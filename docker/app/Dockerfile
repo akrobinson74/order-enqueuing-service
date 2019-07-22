@@ -4,7 +4,7 @@ WORKDIR /workdir
 
 # Application
 COPY build/wait-for-it.sh .
-COPY build/config-stage.yml /opt/config.yml
+COPY build/config-dev.yml /opt/config.yml
 COPY build/order-enqueuing-service.jar .
 # NewRelic java agent
 COPY build/newrelic.jar /opt/newrelic/newrelic.jar

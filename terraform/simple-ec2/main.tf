@@ -27,6 +27,9 @@ variable "service" {
 }
 variable "nr_account_id" {}
 variable "nr_license_key" {}
+variable "route_53_zone_id" {
+  default = "ZE42I9BMPFVSU"
+}
 
 provider "aws" {
   region = "eu-central-1"
@@ -83,6 +86,44 @@ data "template_file" "user_data_ops" {
   }
 }
 
+resource "aws_security_group" "order_svcs" {
+  name = "order_services_sg"
+  description = "allow ssh to all; port 80 filtered"
+  # VPC ID of the 'vpc phizzard' VPC
+  vpc_id = "vpc-a1314dca"
+
+  egress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port = 0
+    protocol = "-1"
+    to_port = 0
+  }
+
+  ingress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port = 22
+    protocol = "tcp"
+    to_port = 22
+  }
+
+  ingress {
+    cidr_blocks = [
+      "2.204.225.55/32",
+      "31.214.144.28/32",
+      "77.64.169.152/32",
+      "77.245.45.50/32",
+      "88.65.1.69/32",
+      "10.0.0.0/8",
+      "18.0.0.0/8",
+      "172.16.0.0/12",
+      "192.168.0.0/16"
+    ]
+    from_port = 80
+    protocol = "tcp"
+    to_port = 80
+  }
+}
+
 resource "aws_instance" "oes" {
   ami = "${data.aws_ami.amazon-linux.id}"
   associate_public_ip_address = true
@@ -92,10 +133,11 @@ resource "aws_instance" "oes" {
   user_data = "${data.template_file.user_data_oes.rendered}"
 
   security_groups = [
-    "sg-0b2ac6867f9311863",
+    "${aws_security_group.order_svcs.id}",
   ]
 
-  subnet_id = "subnet-a904c8d2"
+  # vpc phizzard subnet for eu-central-1a
+  subnet_id = "subnet-120e2679"
 
   tags = {
     Name = "oes-staging"
@@ -111,14 +153,30 @@ resource "aws_instance" "ops" {
   user_data = "${data.template_file.user_data_ops.rendered}"
 
   security_groups = [
-    "sg-0b2ac6867f9311863",
+    "${aws_security_group.order_svcs.id}",
   ]
 
-  subnet_id = "subnet-a904c8d2"
+  subnet_id = "subnet-120e2679"
 
   tags = {
     Name = "ops-staging"
   }
+}
+
+resource "aws_route53_record" "oes" {
+  name = "oes-${var.deployment_tier}.phizzard.app"
+  records = ["${aws_instance.oes.public_ip}"]
+  ttl = 300
+  type = "A"
+  zone_id = "${var.route_53_zone_id}"
+}
+
+resource "aws_route53_record" "ops" {
+  name = "ops-${var.deployment_tier}.phizzard.app"
+  records = ["${aws_instance.ops.public_ip}"]
+  ttl = 300
+  type = "A"
+  zone_id = "${var.route_53_zone_id}"
 }
 
 output "oes-public-ip" {

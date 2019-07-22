@@ -122,3 +122,4 @@ integration-test/.project
 integration-test/.settings/
 integration-test/bin/
 /.classpath
+**/.terraform/

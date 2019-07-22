@@ -69,10 +69,10 @@ val copyNecessaryFiles by tasks.creating(Copy::class) {
 
 val renameProdConfig by tasks.creating(Copy::class) {
     from("$projectDir/src/main/resources") {
-        include("config-prod.yml")
+        include("config-dev.yml")
     }
     rename { fileName ->
-        fileName.replace("-prod","")
+        fileName.replace("-dev","")
     }
     into("$rootDir/docker/app/build")
 }

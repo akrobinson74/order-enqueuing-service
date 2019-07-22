@@ -11,7 +11,7 @@ definitions:
 
 pipelines:
   branches:
-    stage:
+    dev:
       - parallel:
         - step:
             name: Code Quality Check
@@ -76,7 +76,7 @@ pipelines:
             - docker
             - ubuntu
           script:
-            - export APP_ENV=stage
+            - export APP_ENV=dev
             - ls -altr docker/app/build/
             - apt-get -y update && apt-get -y install build-essential curl gnupg libyaml-dev python2.7 python-dev python-pip sudo
             - pip install --upgrade setuptools
@@ -95,7 +95,7 @@ pipelines:
           deployment: staging
           trigger: manual
           script:
-            - export APP_ENV=stage
+            - export APP_ENV=dev
             - apt-get update && apt-get install -y curl unzip python-pip build-essential
             - pip install --upgrade setuptools
             - pip install awscli

@@ -30,7 +30,7 @@ variable "nr_license_key" {}
 variable "route_53_zone_id" {
   default = "ZE42I9BMPFVSU"
 }
-variable "version" {
+variable "version-tag" {
   default = "dev"
 }
 
@@ -67,7 +67,7 @@ data "template_file" "user_data_oes" {
     nr_license_key = "${var.nr_license_key}"
     project = "order-enqueuing-service"
     service = "${var.service}"
-    version = "${var.version}"
+    version = "${var.version-tag}"
   }
 }
 
@@ -88,7 +88,7 @@ data "template_file" "user_data_ops" {
     nr_license_key = "${var.nr_license_key}"
     project = "order-processing-service"
     service = "ops"
-    version = "${var.version}"
+    version = "${var.version-tag}"
   }
 }
 

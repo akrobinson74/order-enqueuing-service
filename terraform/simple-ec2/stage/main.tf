@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket = "kotlin-terraform"
-    key = "dev/orderservices/terraform.tfstate"
+    key = "stage/orderservices/terraform.tfstate"
     region = "eu-central-1"
   }
 }
@@ -16,7 +16,7 @@ variable "cluster_name" {
   default = "order-services"
 }
 variable "deployment_tier" {
-  default = "dev"
+  default = "stage"
 }
 variable "inbound_port" {
   default = 80
@@ -49,7 +49,7 @@ data "aws_ami" "amazon-linux" {
 }
 
 data "template_file" "user_data_oes" {
-  template = "${file("${path.module}/user-data-amazon-linux.sh")}"
+  template = "${file("${path.module}/../user-data-amazon-linux.sh")}"
 
   vars = {
     app_name = "OrderEnqueuingService"
@@ -68,7 +68,7 @@ data "template_file" "user_data_oes" {
 }
 
 data "template_file" "user_data_ops" {
-  template = "${file("${path.module}/user-data-amazon-linux.sh")}"
+  template = "${file("${path.module}/../user-data-amazon-linux.sh")}"
 
   vars = {
     app_name = "OrderProcessingService"
@@ -86,45 +86,45 @@ data "template_file" "user_data_ops" {
   }
 }
 
-resource "aws_security_group" "order_svcs" {
-  name = "order_services_sg"
-  description = "allow ssh to all; port 80 filtered"
-  # VPC ID of the 'vpc phizzard' VPC
-  vpc_id = "vpc-a1314dca"
-
-  egress {
-    cidr_blocks = [
-      "0.0.0.0/0"]
-    from_port = 0
-    protocol = "-1"
-    to_port = 0
-  }
-
-  ingress {
-    cidr_blocks = [
-      "0.0.0.0/0"]
-    from_port = 22
-    protocol = "tcp"
-    to_port = 22
-  }
-
-  ingress {
-    cidr_blocks = [
-      "2.204.225.55/32",
-      "31.214.144.28/32",
-      "77.64.169.152/32",
-      "77.245.45.50/32",
-      "88.65.1.69/32",
-      "10.0.0.0/8",
-      "18.0.0.0/8",
-      "172.16.0.0/12",
-      "192.168.0.0/16"
-    ]
-    from_port = 80
-    protocol = "tcp"
-    to_port = 80
-  }
-}
+//resource "aws_security_group" "order_svcs" {
+//  name = "order_services_sg"
+//  description = "allow ssh to all; port 80 filtered"
+//  # VPC ID of the 'vpc phizzard' VPC
+//  vpc_id = "vpc-a1314dca"
+//
+//  egress {
+//    cidr_blocks = [
+//      "0.0.0.0/0"]
+//    from_port = 0
+//    protocol = "-1"
+//    to_port = 0
+//  }
+//
+//  ingress {
+//    cidr_blocks = [
+//      "0.0.0.0/0"]
+//    from_port = 22
+//    protocol = "tcp"
+//    to_port = 22
+//  }
+//
+//  ingress {
+//    cidr_blocks = [
+//      "2.204.225.55/32",
+//      "31.214.144.28/32",
+//      "77.64.169.152/32",
+//      "77.245.45.50/32",
+//      "88.65.1.69/32",
+//      "10.0.0.0/8",
+//      "18.0.0.0/8",
+//      "172.16.0.0/12",
+//      "192.168.0.0/16"
+//    ]
+//    from_port = 80
+//    protocol = "tcp"
+//    to_port = 80
+//  }
+//}
 
 resource "aws_instance" "oes" {
   ami = "${data.aws_ami.amazon-linux.id}"
@@ -134,8 +134,9 @@ resource "aws_instance" "oes" {
   monitoring = true
   user_data = "${data.template_file.user_data_oes.rendered}"
 
+  # order svcs security group: order_services_sg
   security_groups = [
-    "${aws_security_group.order_svcs.id}",
+    "sg-0675d547eab997ae0",
   ]
 
   # vpc phizzard subnet for eu-central-1a
@@ -154,8 +155,9 @@ resource "aws_instance" "ops" {
   monitoring = true
   user_data = "${data.template_file.user_data_ops.rendered}"
 
+  # order svcs security group: order_services_sg
   security_groups = [
-    "${aws_security_group.order_svcs.id}",
+    "sg-0675d547eab997ae0",
   ]
 
   subnet_id = "subnet-120e2679"

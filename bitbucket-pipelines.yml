@@ -92,7 +92,7 @@ pipelines:
           services:
             - docker
             - ubuntu
-          deployment: staging
+          deployment: test
           trigger: manual
           script:
             - export APP_ENV=dev

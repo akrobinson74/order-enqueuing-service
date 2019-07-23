@@ -38,7 +38,7 @@ output {
     if [type]=="logback" {
          elasticsearch {
              hosts => [ "https://search-search-hpxggu3ndtubx7szxue4pcxb7a.eu-west-1.es.amazonaws.com:443" ]
-             index => "${service}-logback-%%{+YYYY.MM.dd}"
+             index => "${service}-${deployment_tier}-logback-%%{+YYYY.MM.dd}"
         }
     }
 }
@@ -52,7 +52,11 @@ cat>/service-restart.sh<<EOT
 export AWS_ACCESS_KEY_ID="${aws_key}"
 export AWS_SECRET_ACCESS_KEY="${aws_secret}"
 
-tag=\$\{1:-"${version}"\}
+tag=${version}
+if [[ ! -z "\$1" ]]; then
+    tag=\$1
+fi
+
 ecr_url="806353235757.dkr.ecr.eu-central-1.amazonaws.com/${project}:\$tag"
 
 eval \$(aws ecr get-login --region eu-central-1 --no-include-email)

@@ -101,6 +101,76 @@ resource "aws_route53_record" "oes" {
   zone_id = "${var.route_53_zone_id}"
 }
 
+resource "aws_alb_target_group_attachment" "oes_dev_tg" {
+  port = 80
+  target_group_arn = "arn:aws:elasticloadbalancing:eu-central-1:806353235757:targetgroup/oes-dev-tg/dd82a028c9f90137"
+  target_id = "${aws_instance.oes.id}"
+}
+
 output "oes-public-ip" {
   value = "${aws_instance.oes.public_ip}"
 }
+/*
+resource "aws_route53_record" "dev_oes" {
+
+  name = "${var.deployment_tier == "prod" ? "" : "${var.deployment_tier}"}.oes.phizzard.app"
+  alias {
+    evaluate_target_health = true
+    # both name and zone_id taken from route53 "Hosted zones" dashboard
+    name = "dualstack.orderservices-elb-1322745023.eu-central-1.elb.amazonaws.com."
+    zone_id = "Z215JYRZR1TBD5"
+  }
+  type = "A"
+  zone_id = "${var.route_53_zone_id}"
+}
+
+resource "aws_s3_bucket" "oes_dev_site_bucket" {
+  bucket = "${aws_route53_record.oes.name}"
+  acl = "public-read"
+
+  website {
+    index_document = "index.html"
+    error_document = "error.html"
+  }
+}
+
+# cloudfront distribution
+resource "aws_cloudfront_distribution" "site_distribution" {
+  origin {
+    domain_name = "${aws_s3_bucket.oes_dev_site_bucket.bucket_domain_name}"
+    origin_id = "${aws_route53_record.oes.name}-origin"
+  }
+  enabled = true
+  aliases = ["${aws_route53_record.oes.name}"]
+  price_class = "PriceClass_100"
+  default_root_object = "index.html"
+  default_cache_behavior {
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH",
+      "POST", "PUT"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "${aws_route53_record.oes.name}-origin"
+    forwarded_values {
+      query_string = true
+      cookies {
+        forward = "all"
+      }
+    }
+    viewer_protocol_policy = "https-only"
+    min_ttl                = 0
+    default_ttl            = 1000
+    max_ttl                = 86400
+  }
+  restrictions {
+    geo_restriction {
+      restriction_type = "whitelist"
+      locations = ["DE"]
+    }
+  }
+  viewer_certificate {
+    acm_certificate_arn = "arn:aws:acm:eu-central-1:806353235757:certificate/eacb8bc0-13ce-4707-b565-1cbfc4e7496e"
+    ssl_support_method  = "sni-only"
+    minimum_protocol_version = "TLSv1.1_2016" # defaults wrong, set
+  }
+}
+# arn:aws:acm:eu-central-1:806353235757:certificate/eacb8bc0-13ce-4707-b565-1cbfc4e7496e
+*/

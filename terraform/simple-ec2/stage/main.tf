@@ -101,6 +101,12 @@ resource "aws_route53_record" "oes" {
   zone_id = "${var.route_53_zone_id}"
 }
 
+resource "aws_alb_target_group_attachment" "oes_stage_tg" {
+  port = 80
+  target_group_arn = "arn:aws:elasticloadbalancing:eu-central-1:806353235757:targetgroup/oes-stage-tg/f1a6de6de7cc5871"
+  target_id = "${aws_instance.oes.id}"
+}
+
 output "oes-public-ip" {
   value = "${aws_instance.oes.public_ip}"
 }

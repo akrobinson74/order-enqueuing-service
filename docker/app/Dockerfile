@@ -6,10 +6,11 @@ WORKDIR /workdir
 COPY build/wait-for-it.sh .
 COPY build/config-dev.yml /opt/config.yml
 COPY build/order-enqueuing-service.jar .
+
 # NewRelic java agent
-COPY build/newrelic.jar /opt/newrelic/newrelic.jar
-COPY build/newrelic.yml /opt/newrelic/newrelic.yml
+ADD build/newrelic-5.3.0/ /opt/newrelic/
+RUN mkdir -p /opt/newrelic/logs
 
 EXPOSE 9080
 
-CMD ["java", "-jar", "order-enqueuing-service.jar", "/opt/config.yml"]
+CMD ["java", "-javaagent:/opt/newrelic/newrelic.jar", "-jar", "order-enqueuing-service.jar", "/opt/config.yml"]

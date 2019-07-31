@@ -26,6 +26,7 @@ variable "service" {
   default = "oes"
 }
 variable "nr_account_id" {}
+variable "nr_insights_key" {}
 variable "nr_license_key" {}
 variable "route_53_zone_id" {
   default = "ZE42I9BMPFVSU"
@@ -64,6 +65,7 @@ data "template_file" "user_data_oes" {
     deployment_tier = "${var.deployment_tier}"
     inbound_port = "${var.inbound_port}"
     nr_account_id = "${var.nr_account_id}"
+    nr_insights_key = "${var.nr_insights_key}"
     nr_license_key = "${var.nr_license_key}"
     project = "order-enqueuing-service"
     service = "${var.service}"
@@ -74,7 +76,7 @@ data "template_file" "user_data_oes" {
 resource "aws_instance" "oes" {
   ami = "${data.aws_ami.amazon-linux.id}"
   associate_public_ip_address = true
-  instance_type = "t2.micro"
+  instance_type = "t2.small"
   key_name = "akr-key-pair1"
   monitoring = true
   user_data = "${data.template_file.user_data_oes.rendered}"

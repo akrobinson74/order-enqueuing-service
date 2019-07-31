@@ -1,17 +1,11 @@
-# Ignore Gradle project-specific cache directory
-.gradle
-
 # Eclipse non-sense
 .classpath
 .project
 
 # Ignore Gradle build output directory
 build
-
-.idea
 out
 *.bak
-*.log
 
 # Created by .ignore support plugin (hsz.mobi)
 ### Java template
@@ -110,8 +104,6 @@ gradle-app.setting
 .DS_Store
 
 # Visual Studio Code
-.classpath
-.project
 .settings/
 app/.classpath
 app/.project
@@ -124,3 +116,4 @@ integration-test/bin/
 /.classpath
 **/.terraform/
 misc/
+!app/src/main/resources/**/*.jar

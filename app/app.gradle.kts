@@ -1,4 +1,3 @@
-
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
@@ -7,9 +6,6 @@ plugins {
 }
 
 // -------------------------- Dependencies ------------------------------------
-
-val newrelic by configurations.creating
-
 dependencies {
     api(Libs.aws_sqs_msg_lib)
     api(Libs.bcprov_jdk15on)
@@ -38,8 +34,6 @@ dependencies {
     testImplementation(Libs.embedded_mongo)
     testImplementation(Libs.io_mockk)
     testImplementation(Libs.test_containers)
-
-    newrelic(Libs.newrelic_agent)
 }
 
 // -------------------------- Building Application ----------------------------
@@ -49,15 +43,10 @@ application {
 }
 
 val copyNewRelicAgent by tasks.creating(Copy::class) {
-    from(newrelic)
     from("$projectDir/src/main/resources") {
-        include("newrelic.yml")
+        include("newrelic-${Versions.com_newrelic_agent_java}/")
     }
     into("$rootDir/docker/app/build/")
-    rename {
-        if (it == "newrelic-agent-${Versions.com_newrelic_agent_java}.jar") "newrelic.jar"
-        else it
-    }
 }
 
 val copyNecessaryFiles by tasks.creating(Copy::class) {

@@ -50,7 +50,7 @@ subprojects {
         testImplementation(Libs.mockito_kotlin) {
             exclude(module = "kotlin-reflect")
         }
-        testImplementation(Libs.okhttp3_mockwebserver)
+        testImplementation(Libs.mockwebserver)
         testImplementation(Libs.vertx_junit5)
         testRuntimeOnly(Libs.junit_jupiter_engine)
         ktlint(Libs.ktlint)

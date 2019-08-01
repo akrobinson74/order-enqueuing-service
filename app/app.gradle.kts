@@ -7,7 +7,7 @@ plugins {
 
 // -------------------------- Dependencies ------------------------------------
 dependencies {
-    api(Libs.aws_sqs_msg_lib)
+    api(Libs.amazon_sqs_java_messaging_lib)
     api(Libs.bcprov_jdk15on)
     api(Libs.jackson_datatype_jsr310)
     api(Libs.jackson_module_kotlin)
@@ -30,10 +30,10 @@ dependencies {
 
     runtimeOnly(Libs.logback_classic)
 
-    testImplementation(Libs.elastimq_sqs)
-    testImplementation(Libs.embedded_mongo)
-    testImplementation(Libs.io_mockk)
-    testImplementation(Libs.test_containers)
+    testImplementation(Libs.elasticmq_rest_sqs_2_12)
+    testImplementation(Libs.de_flapdoodle_embed_mongo)
+    testImplementation(Libs.mockk)
+    testImplementation(Libs.junit_jupiter)
 }
 
 // -------------------------- Building Application ----------------------------
@@ -44,7 +44,7 @@ application {
 
 val copyNewRelicAgent by tasks.creating(Copy::class) {
     from("$projectDir/src/main/resources") {
-        include("newrelic-${Versions.com_newrelic_agent_java}/")
+        include("newrelic-${Versions.newrelic_api}/")
     }
     into("$rootDir/docker/app/build/")
 }

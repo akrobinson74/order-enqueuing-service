@@ -65,7 +65,7 @@ docker run \\
     -e NR_INSIGHTS_KEY="${nr_license_key}" \\
     -e NEW_RELIC_APP_NAME="${app_name}" \\
     -e NEW_RELIC_LICENSE_KEY="${nr_license_key}" \\
-    -e NEW_RELIC_PROCESS_HOST_DISPLAY_NAME="ops${deployment_tier == "prod" ? "" : "-${deployment_tier}"}.phizzard.app" \\
+    -e NEW_RELIC_PROCESS_HOST_DISPLAY_NAME="oes${deployment_tier == "prod" ? "" : "-${deployment_tier}"}.phizzard.app" \\
     -e ENV=${deployment_tier} \\
     --name=${service} \\
     -p ${inbound_port}:${container_port} \\

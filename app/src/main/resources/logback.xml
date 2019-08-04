@@ -16,7 +16,7 @@
         </encoder>
     </appender>
     <appender name="STASH" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/var/log/logback.log</file>
+        <file>/var/log/logback/logback.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>logback.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>7</maxHistory>

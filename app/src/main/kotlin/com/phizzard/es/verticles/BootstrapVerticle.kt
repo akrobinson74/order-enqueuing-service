@@ -19,6 +19,7 @@ import com.phizzard.es.METRICS
 import com.phizzard.es.OPEN_API_PATH
 import com.phizzard.es.SqsConfig
 import com.phizzard.es.corsConfig
+import com.phizzard.es.extensions.requestMarker
 import com.phizzard.es.handlers.ErrorHandlers
 import com.phizzard.es.handlers.MessageEnqueuingHandler
 import com.phizzard.es.handlers.OrderRetrievalHandler
@@ -26,7 +27,6 @@ import com.phizzard.es.handlers.OrderStorageHandler
 import com.phizzard.es.handlers.buildHealthCheck
 import com.phizzard.es.mongoConfig
 import com.phizzard.es.prometheusHandler
-import com.phizzard.es.requestMarker
 import com.phizzard.es.sqsConfig
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject

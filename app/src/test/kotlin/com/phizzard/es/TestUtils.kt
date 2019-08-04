@@ -53,7 +53,7 @@ const val SAMPLE_ORDER = """
 }
 """
 
-const val orderWithStringsForDoubles = """
+const val ORDER_WITH_STRINGS_FOR_DOUBLES = """
 {
   "id": 123467890,
   "approvalCode": "666",

@@ -21,9 +21,18 @@ fun buildMetricsOptions(): MicrometerMetricsOptions {
     if (!System.getenv(NR_INSIGHTS_KEY).isNullOrEmpty()) {
         registries += NewRelicMeterRegistry(
             object : NewRelicConfig {
-                override fun accountId(): String { val accountId = System.getenv(NR_ACCOUNT_ID); System.out.println(accountId); return accountId }
-                override fun apiKey(): String { val apiKey = System.getenv(NR_INSIGHTS_KEY); System.out.println(apiKey); return apiKey }
+                override fun accountId(): String {
+                    val accountId = System.getenv(NR_ACCOUNT_ID); System.out.println(accountId); return accountId
+                }
+
+                override fun apiKey(): String {
+                    val apiKey = System.getenv(NR_INSIGHTS_KEY); System.out.println(apiKey); return apiKey
+                }
+
                 override fun get(key: String): String? = null
+
+                override fun uri(): String =
+                    System.getenv(INSIGHTS_URI) ?: "https://insights-collector.eu01.nr-data.net"
             }, io.micrometer.core.instrument.Clock.SYSTEM
         ).also { it.config().commonTags("appName", System.getenv(NEW_RELIC_APP_NAME)) }
     }
@@ -53,6 +62,7 @@ fun prometheusHandler(routingContext: RoutingContext) {
 }
 
 private const val COMPOSITE_REGISTRY_NAME = "composite"
+private const val INSIGHTS_URI = "INSIGHTS_URI"
 private const val NEW_RELIC_APP_NAME = "NEW_RELIC_APP_NAME"
 private const val NR_INSIGHTS_KEY = "NR_INSIGHTS_KEY"
 private const val NR_ACCOUNT_ID = "NR_ACCOUNT_ID"

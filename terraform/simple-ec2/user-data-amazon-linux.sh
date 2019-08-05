@@ -62,13 +62,14 @@ docker run \\
     -e AWS_ACCESS_KEY_ID="${aws_key}" \\
     -e AWS_SECRET_ACCESS_KEY="${aws_secret}" \\
     -e NR_ACCOUNT_ID="${nr_account_id}" \\
-    -e NR_INSIGHTS_KEY="${nr_license_key}" \\
+    -e NR_INSIGHTS_KEY="${nr_insights_key}" \\
     -e NEW_RELIC_APP_NAME="${app_name}" \\
     -e NEW_RELIC_LICENSE_KEY="${nr_license_key}" \\
     -e NEW_RELIC_PROCESS_HOST_DISPLAY_NAME="oes${deployment_tier == "prod" ? "" : "-${deployment_tier}"}.phizzard.app" \\
     -e ENV=${deployment_tier} \\
     --name=${service} \\
     -p ${inbound_port}:${container_port} \\
+    -v /var/log/logback:/var/log/logback \\
     -d \$ecr_url
 
 EOT

@@ -10,91 +10,95 @@ definitions:
       image: ubuntu:latest
 
 pipelines:
-  branches:
-    dev:
-      - parallel:
-        - step:
-            name: Code Quality Check
-            services:
-              - gradle
-            script:
-              - ./gradlew ktlintCheck
-              - ./gradlew detekt
-        - step:
-            name: Code Compilation
-            services:
-              - gradle
-            caches:
-              - gradle
-            script:
-              - ./gradlew :app:compileTestKotlin
-              - ./gradlew :integration-test:compileTestKotlin
-      - parallel:
-        - step:
-            name: Run Unit Tests
-            services:
-              - gradle
-            caches:
-              - gradle
-            script:
-              - ./gradlew :app:test
-        - step:
-            name: Run Integration Tests
-            services:
-              - gradle
-            caches:
-              - gradle
-            script:
-              - ./gradlew :integration-test:test
+  default:
+    - parallel:
       - step:
-          name: Check Code Coverage
+          name: Code Quality Check
+          services:
+            - gradle
+          script:
+            - ./gradlew ktlintCheck
+            - ./gradlew detekt
+      - step:
+          name: Code Compilation
           services:
             - gradle
           caches:
             - gradle
           script:
-            - ./gradlew jacocoRootTestReport
+            - ./gradlew :app:compileTestKotlin
+            - ./gradlew :integration-test:compileTestKotlin
+    - parallel:
       - step:
-          name: Build fatjar
-          services:
-            - gradle
-          caches:
-            - gradle
-          script:
-            - ./gradlew :app:shadowJar
-          artifacts:
-            - docker/app/build/*.*
-            - docker/app/build/newrelic-5.3.0/*
-      - step:
-          name: Build Docker Image
-          caches:
-            - gradle
+          name: Run Unit Tests
+          size: 2x
           services:
             - docker
-            - ubuntu
-          script:
-            - export APP_ENV=dev
-            - ls -altr docker/app/build/
-            - apt-get -y update && apt-get -y install build-essential curl gnupg libyaml-dev python2.7 python-dev python-pip sudo
-            - pip install --upgrade setuptools
-            - pip install --upgrade pip
-            - pip install requests[security]
-            - pip install awscli
-            - ls -altr docker/app/build/
-            - make release VERSION=${BITBUCKET_COMMIT:0:7}
-      - step:
-          name: Deploy
+            - gradle
           caches:
-            - pip
+            - gradle
+          script:
+            - export TESTCONTAINERS_RYUK_DISABLED=true
+            - ./gradlew :app:test
+      - step:
+          name: Run Integration Tests
           services:
             - docker
-            - ubuntu
-          deployment: test
-          trigger: manual
+            - gradle
+          caches:
+            - gradle
           script:
-            - export APP_ENV=dev
-            - apt-get update && apt-get install -y curl unzip python-pip build-essential
-            - pip install --upgrade setuptools
-            - pip install awscli
-            - curl https://releases.hashicorp.com/terraform/0.12.5/terraform_0.12.5_linux_amd64.zip > /tmp/terraform_0.12.5_linux_amd64.zip && unzip /tmp/terraform_0.12.5_linux_amd64.zip -d /bin
-            - make rollout-dev VERSION=${BITBUCKET_COMMIT:0:7}
+            - export TESTCONTAINERS_RYUK_DISABLED=true
+            - ./gradlew :integration-test:test
+    - step:
+        name: Check Code Coverage
+        services:
+          - gradle
+        caches:
+          - gradle
+        script:
+          - ./gradlew jacocoRootTestReport
+    - step:
+        name: Build fatjar
+        services:
+          - gradle
+        caches:
+          - gradle
+        script:
+          - ./gradlew :app:shadowJar
+        artifacts:
+          - docker/app/build/*.*
+          - docker/app/build/newrelic-5.3.0/*
+    - step:
+        name: Build Docker Image
+        caches:
+          - gradle
+        services:
+          - docker
+          - ubuntu
+        script:
+          - export APP_ENV=dev
+          - ls -altr docker/app/build/
+          - apt-get -y update && apt-get -y install build-essential curl gnupg libyaml-dev python2.7 python-dev python-pip sudo
+          - pip install --upgrade setuptools
+          - pip install --upgrade pip
+          - pip install requests[security]
+          - pip install awscli
+          - ls -altr docker/app/build/
+          - make release VERSION=${BITBUCKET_COMMIT:0:7}
+    - step:
+        name: Deploy
+        caches:
+          - pip
+        services:
+          - docker
+          - ubuntu
+        deployment: test
+        trigger: automatic
+        script:
+          - export APP_ENV=dev
+          - apt-get update && apt-get install -y curl unzip python-pip build-essential
+          - pip install --upgrade setuptools
+          - pip install awscli
+          - curl https://releases.hashicorp.com/terraform/0.12.6/terraform_0.12.6_linux_amd64.zip > /tmp/terraform_0.12.6_linux_amd64.zip && unzip /tmp/terraform_0.12.6_linux_amd64.zip -d /bin
+          - make rollout-dev VERSION=${BITBUCKET_COMMIT:0:7}

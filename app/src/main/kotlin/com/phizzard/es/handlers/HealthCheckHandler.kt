@@ -17,7 +17,7 @@ fun buildHealthCheck(vertx: Vertx): HealthCheckHandler = HealthCheckHandler.crea
 
 private fun HealthChecks.register(vertx: Vertx, name: String, address: String): HealthChecks =
     register("health/$name", HEALTH_CHECK_TIMEOUT) { future ->
-        vertx.eventBus().send<JsonObject>(address, JsonObject()) {
+        vertx.eventBus().request<JsonObject>(address, JsonObject()) {
             if (it.succeeded()) future.complete(Status.OK())
             else future.complete(Status.KO())
         }

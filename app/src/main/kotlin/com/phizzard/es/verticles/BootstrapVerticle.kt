@@ -1,6 +1,6 @@
 package com.phizzard.es.verticles
 
-import arrow.core.Try
+import arrow.core.Either
 import com.amazonaws.auth.AWSStaticCredentialsProvider
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
@@ -12,6 +12,7 @@ import com.phizzard.es.BOOTSTRAP_HEALTH
 import com.phizzard.es.CREATE_ORDER_OPERATION_ID
 import com.phizzard.es.CorsConfig
 import com.phizzard.es.DEFAULT_HTTP_PORT
+import com.phizzard.es.GET_ALL_ORDERS_OPERATION_ID
 import com.phizzard.es.GET_ORDER_OPERATION_ID
 import com.phizzard.es.HEALTH_CHECK
 import com.phizzard.es.HTTP_PORT
@@ -42,6 +43,8 @@ import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.ext.web.api.contract.openapi3.OpenAPI3RouterFactory.createAwait
 import io.vertx.kotlin.ext.web.api.contract.routerFactoryOptionsOf
 import kotlinx.coroutines.launch
+import org.apache.http.HttpStatus.SC_BAD_REQUEST
+import org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR
 import org.slf4j.LoggerFactory
 
 class BootstrapVerticle : CoroutineVerticle() {
@@ -58,11 +61,11 @@ class BootstrapVerticle : CoroutineVerticle() {
         registerJacksonModules()
 
         val routerOptions = routerFactoryOptionsOf(
-            mountValidationFailureHandler = true,
             mountNotImplementedHandler = true
         )
 
         val mongoClient = MongoClient.createShared(vertx, mongoConfig)
+        val orderRetrievalHandler = OrderRetrievalHandler(mongoClient)
         val sqsClient: AmazonSQS = AmazonSQSClientBuilder.standard()
             .withCredentials(
                 AWSStaticCredentialsProvider(BasicAWSCredentials(sqsConfig.accessKeyId, sqsConfig.secretAccessKey))
@@ -77,7 +80,7 @@ class BootstrapVerticle : CoroutineVerticle() {
             .addHandlerByOperationId(HEALTH_CHECK, buildHealthCheck(vertx))
             .addHandlerByOperationId(METRICS, ::prometheusHandler)
             .addSuspendingHandlerByOperationId(
-                handler = OrderStorageHandler(mongoClient)::handle,
+                handler = OrderStorageHandler(mongoClient)::handleNewOrder,
                 operationId = CREATE_ORDER_OPERATION_ID
             )
             .addSuspendingHandlerByOperationId(
@@ -88,10 +91,13 @@ class BootstrapVerticle : CoroutineVerticle() {
                 operationId = CREATE_ORDER_OPERATION_ID
             )
             .addSuspendingHandlerByOperationId(
-                handler = OrderRetrievalHandler(mongoClient)::handle,
+                handler = orderRetrievalHandler::handleGetOrderById,
                 operationId = GET_ORDER_OPERATION_ID
             )
-            .setValidationFailureHandler(ErrorHandlers()::handleOpenApiValidationError)
+            .addSuspendingHandlerByOperationId(
+                handler = orderRetrievalHandler::handleAllOrdersForUserId,
+                operationId = GET_ALL_ORDERS_OPERATION_ID
+            )
             .addGlobalHandler(
                 CorsHandler.create(corsConfig.allowedOriginPattern)
                     .allowedHeaders(corsConfig.allowedHeaders)
@@ -101,6 +107,8 @@ class BootstrapVerticle : CoroutineVerticle() {
             .setBodyHandler(BodyHandler.create(false))
             .setOptions(routerOptions)
             .router
+            .errorHandler(SC_BAD_REQUEST, ErrorHandlers()::handleOpenApiValidationError)
+            .errorHandler(SC_INTERNAL_SERVER_ERROR, ErrorHandlers()::defaultErrorHandler)
 
         vertx.createHttpServer()
             .requestHandler(router)
@@ -109,7 +117,7 @@ class BootstrapVerticle : CoroutineVerticle() {
         logger.info("Started BootstrapVerticle")
     }
 
-    private fun OpenAPI3RouterFactory.addSuspendingHandlerByOperationId(
+    fun OpenAPI3RouterFactory.addSuspendingHandlerByOperationId(
         operationId: String,
         handler: suspend (RoutingContext) -> Unit
     ): OpenAPI3RouterFactory = addHandlerByOperationId(operationId) { routingContext ->
@@ -117,9 +125,8 @@ class BootstrapVerticle : CoroutineVerticle() {
 
         launch {
             token.link()
-            Try { handler(routingContext) }
-                .failed()
-                .map {
+            Either.catch { handler(routingContext) }
+                .mapLeft {
                     logger.error(routingContext.requestMarker, "request failed", it.cause ?: it)
                     routingContext.fail(it)
                 }

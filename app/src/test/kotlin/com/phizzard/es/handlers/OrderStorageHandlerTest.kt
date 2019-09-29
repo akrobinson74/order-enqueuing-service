@@ -1,64 +1,177 @@
 package com.phizzard.es.handlers
 
-import com.amazonaws.services.sqs.AmazonSQS
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
+import com.fasterxml.jackson.module.kotlin.readValue
+import com.phizzard.es.EMBEDDED_MONGO_HOST
+import com.phizzard.es.EMBEDDED_MONGO_PORT
+import com.phizzard.es.EmbeddedMongoDBTestInstance
+import com.phizzard.es.GET_ORDER_ENDPOINT
+import com.phizzard.es.LOCATION_HEADER
 import com.phizzard.es.MONGO_ID
-import io.vertx.core.AsyncResult
-import io.vertx.core.Handler
+import com.phizzard.es.ORDERS_COLLECTION_NAME
+import com.phizzard.es.SAMPLE_MONGO_ORDER
+import com.phizzard.es.SAMPLE_ORDER
+import com.phizzard.es.extensions.getFindByIdQuery
+import com.phizzard.es.mapper
+import com.phizzard.es.models.StoredOrder
+import com.phizzard.es.registerJacksonModules
+import com.phizzard.models.OrderStatus
+import io.kotlintest.shouldBe
+import io.mockk.coEvery
+import io.mockk.mockk
+import io.mockk.slot
+import io.vertx.core.Vertx
+import io.vertx.core.json.JsonObject
+import io.vertx.ext.mongo.BulkOperation
 import io.vertx.ext.mongo.MongoClient
+import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
-import org.mockito.Mockito.`when`
-import org.slf4j.LoggerFactory
-import java.math.BigInteger
-import java.security.MessageDigest
-import java.util.UUID
+import io.vertx.ext.web.client.WebClient
+import io.vertx.ext.web.handler.BodyHandler
+import io.vertx.junit5.VertxExtension
+import io.vertx.junit5.VertxTestContext
+import io.vertx.kotlin.core.http.listenAwait
+import io.vertx.kotlin.ext.mongo.bulkWriteAwait
+import io.vertx.kotlin.ext.mongo.findAwait
+import io.vertx.kotlin.ext.web.client.sendJsonObjectAwait
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import org.apache.http.HttpStatus.SC_ACCEPTED
+import org.apache.http.HttpStatus.SC_CREATED
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(VertxExtension::class)
 class OrderStorageHandlerTest {
-    private val resultsMap = hashMapOf<String, String>()
+    private val embeddedMongoDBTestInstance = EmbeddedMongoDBTestInstance()
+    private val json = mapper.readValue<StoredOrder>(SAMPLE_MONGO_ORDER)
 
-    private val handler: (String) -> String = { json ->
-        val md5HashString = BigInteger(1, MessageDigest.getInstance("MD5").digest(json.toByteArray())).toString(16)
+    init {
+        registerJacksonModules()
+    }
 
-        when (resultsMap.containsKey(md5HashString)) {
-            false -> resultsMap.put(md5HashString, UUID.randomUUID().toString())
-                ?: throw RuntimeException(
-                    "I thought the JVM was smarter...no way this exception should ever be thrown or necessary here"
+    @BeforeEach
+    fun startMongo() {
+        embeddedMongoDBTestInstance.setUp()
+    }
+
+    @AfterEach
+    fun stopMongo() {
+        embeddedMongoDBTestInstance.tearDown()
+    }
+
+    @Test
+    fun `store order`(context: VertxTestContext, vertx: Vertx) =
+        runBlocking {
+            val mongoClient = MongoClient.createNonShared(
+                vertx,
+                JsonObject().put("host", EMBEDDED_MONGO_HOST).put("port", EMBEDDED_MONGO_PORT).put(
+                    "db_name",
+                    "OrderStorageHandlerTest"
                 )
-            else -> resultsMap.get(md5HashString) ?: throw RuntimeException("No UUID for for json blob: $json")
-        }
-    }
-    val resultHandler: Handler<AsyncResult<io.vertx.ext.mongo.MongoClient>> =
-        Handler<AsyncResult<io.vertx.ext.mongo.MongoClient>>() {
-            fun handle(ar: AsyncResult<MongoClient>) {
-                io.vertx.reactivex.ext.mongo.MongoClient(ar.result())
+            )
+
+            var mongoId: String? = null
+            val enqueuingHandler = mockk<MessageEnqueuingHandler>() {
+                val contextSlot = slot<RoutingContext>()
+                coEvery { handle(capture(contextSlot)) } answers {
+                    val routingContext = contextSlot.captured
+                    mongoId = routingContext.get<String>(MONGO_ID)
+                    routingContext
+                        .response()
+                        .setStatusCode(SC_CREATED)
+                        .putHeader(LOCATION_HEADER, "$GET_ORDER_ENDPOINT/$mongoId")
+                        .end(OrderEnqueuingResponse(mongoId ?: "").asJsonString())
+                }
             }
+            val orderHandler = OrderStorageHandler(mongoClient)
+
+            val router = Router.router(vertx)
+            router.post("/:platformId/order")
+                .handler(BodyHandler.create())
+                .handler {
+                    it.pathParams().put("platformId", "PSG")
+                    launch {
+                        (orderHandler::handleNewOrder)(it)
+                    }
+                }
+                .handler { launch { (enqueuingHandler::handle)(it) } }
+
+            val server = vertx.createHttpServer().requestHandler(router).listenAwait(54321)
+
+            val response = WebClient.create(vertx).post(54321, "localhost", "/{platformId}/order")
+                .putHeader("Content-Type", "application/json")
+                .sendJsonObjectAwait(JsonObject(SAMPLE_ORDER))
+
+            context.verify {
+                response.statusCode() shouldBe 201
+                response.headers()["location"] shouldBe "/order/$mongoId"
+            }
+
+            server.close()
+            context.completeNow()
         }
 
-    private val mockMongoClient: MongoClient = mock<MongoClient>() {
-        `when` { mock.save(any(), any(), any()) } doReturn null
-    }
-    private val mockSqs = mock<AmazonSQS>()
+    @Test
+    fun `update order status`(context: VertxTestContext, vertx: Vertx) =
+        runBlocking {
+            val mongoClient = MongoClient.createNonShared(
+                vertx,
+                JsonObject().put("host", EMBEDDED_MONGO_HOST).put("port", EMBEDDED_MONGO_PORT).put(
+                    "db_name",
+                    "OrderStorageHandlerTest"
+                )
+            )
 
-    fun `verify a mongoId is propagated in the routingContext`() {
-    }
-}
+            mongoClient.bulkWriteAwait(
+                ORDERS_COLLECTION_NAME, listOf(
+                    BulkOperation.createInsert(JsonObject(SAMPLE_MONGO_ORDER).put("_id", "1"))
+                )
+            )
 
-class OrderStorageMongoResultHandler(val routingContext: RoutingContext) : Handler<AsyncResult<String>> {
-    override fun handle(result: AsyncResult<String>) {
-        when (result.succeeded()) {
-            true -> routingContext.put(MONGO_ID, result.result())
-            else -> reportMongoError(result)
+            val enqueuingHandler = mockk<MessageEnqueuingHandler>() {
+                val contextSlot = slot<RoutingContext>()
+                coEvery { handle(capture(contextSlot)) } answers {
+                    val routingContext = contextSlot.captured
+                    val mongoId = routingContext.get<String>(MONGO_ID)
+                    routingContext
+                        .response()
+                        .setStatusCode(SC_ACCEPTED)
+                        .putHeader(LOCATION_HEADER, "$GET_ORDER_ENDPOINT/$mongoId")
+                        .end(OrderEnqueuingResponse(mongoId).asJsonString())
+                }
+            }
+            val orderHandler = OrderStorageHandler(mongoClient)
+
+            val router = Router.router(vertx)
+            router.put("/order/:orderId")
+                .handler(BodyHandler.create())
+                .handler {
+                    it.pathParams().put("platformId", "PSG")
+                    launch {
+                        (orderHandler::handleOrderStatusUpdate)(it)
+                    }
+                }
+                .handler { launch { (enqueuingHandler::handle)(it) } }
+
+            val server = vertx.createHttpServer().requestHandler(router).listenAwait(54321)
+
+            val response = WebClient.create(vertx).put(54321, "localhost", "/order/{orderId}")
+                .putHeader("Content-Type", "application/json")
+                .putHeader("userId", "PSG")
+                .addQueryParam("orderId", "1")
+                .sendJsonObjectAwait(JsonObject().put("status", OrderStatus.APPROVED))
+
+            val mongoOrderList = mongoClient.findAwait(ORDERS_COLLECTION_NAME, "1".getFindByIdQuery())
+
+            context.verify {
+                response.statusCode() shouldBe 202
+                response.headers()["location"] shouldBe "/order/1"
+                mongoOrderList[0].getString("status") shouldBe OrderStatus.APPROVED.name
+            }
+
+            server.close()
+            context.completeNow()
         }
-    }
-
-    private fun reportMongoError(result: AsyncResult<String>) {
-        val errorMsg = result.cause().message ?: "Unaccounted for MongoClient save error :(!"
-        logger.error(errorMsg)
-    }
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(OrderStorageMongoResultHandler::class.java)
-    }
 }

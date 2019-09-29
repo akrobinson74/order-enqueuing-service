@@ -7,8 +7,9 @@ const val SQS_URL = "SQS_URL"
 
 // Default values
 const val DEFAULT_HTTP_PORT = 9080
-
+const val LOCALHOST = "http://127.0.0.1"
 const val MONGO_ID = "mongo-id"
+const val MONGO_ID_FIELD_NAME = "_id"
 const val ORDERS_COLLECTION_NAME = "orders"
 const val REQUEST_CONTEXT = "requestContext"
 
@@ -22,12 +23,15 @@ const val GET_ORDER_ENDPOINT = "/order"
 const val POST_ORDER_ENDPOINT = "/create"
 
 const val CREATE_ORDER_OPERATION_ID = "createOrder"
+const val GET_ALL_ORDERS_OPERATION_ID = "getAllOrders"
 const val GET_ORDER_OPERATION_ID = "getOrder"
 const val HEALTH_CHECK = "healthCheck"
 const val METRICS = "metrics"
-const val OPEN_API_PATH = "/openapi.yaml"
+const val OPEN_API_PATH = "openapi.yaml"
 
 const val ORDER_ID_PATH_PARAM_NAME = "orderId"
+const val PARTNER_ID_PATH_PARAM_NAME = "platformId"
+const val PLATFORM_ID = "platformId"
 
 const val BOOTSTRAP = "com.phizzard.es.bootstrap"
 const val BOOTSTRAP_HEALTH = "bootstrap-health"

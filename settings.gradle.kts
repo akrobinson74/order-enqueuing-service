@@ -4,14 +4,12 @@ pluginManagement {
     }
 }
 
-include("app", "integration-test")
+include("acceptance-test", "app", "integration-test")
 
 with(rootProject) {
     name = "order-enqueuing-service"
     children.forEach { it.buildFileName = "${it.name}.gradle.kts" }
 }
-
-enableFeaturePreview("IMPROVED_POM_SUPPORT")
 
 val isCiServer = false // disabled until the cache is back
 buildCache {

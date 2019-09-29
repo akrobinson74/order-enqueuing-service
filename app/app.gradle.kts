@@ -16,6 +16,7 @@ dependencies {
     api(Libs.micrometer_registry_new_relic)
     api(Libs.micrometer_registry_prometheus)
     api(Libs.newrelic_api)
+    api(Libs.orderservice_common)
     api(Libs.vertx_config)
     api(Libs.vertx_config_yaml)
     api(Libs.vertx_core)
@@ -39,7 +40,7 @@ dependencies {
 // -------------------------- Building Application ----------------------------
 
 application {
-    mainClassName = "com.phizzard.es.AppKt"
+    mainClassName = "com.phizzard.es.VertxAppKt"
 }
 
 val copyNewRelicAgent by tasks.creating(Copy::class) {
@@ -68,9 +69,10 @@ val renameProdConfig by tasks.creating(Copy::class) {
 
 tasks {
     getByName<ShadowJar>("shadowJar") {
-        baseName = rootProject.name
-        classifier = ""
-        destinationDir = file("$rootDir/docker/app/build/")
+        getArchiveBaseName().set(rootProject.name)
+        archiveClassifier.set("")
+        getDestinationDirectory().set(file("$rootDir/docker/app/build/"))
+        isZip64 = true
         mergeServiceFiles()
         exclude("META-INF/*.DSA", "META-INF/*.RSA", "*.yml", "*.pem")
 

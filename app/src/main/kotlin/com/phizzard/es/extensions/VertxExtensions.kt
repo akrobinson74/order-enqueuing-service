@@ -1,6 +1,6 @@
 package com.phizzard.es.extensions
 
-import arrow.core.Try
+import arrow.core.Either
 import com.newrelic.api.agent.NewRelic
 import io.vertx.core.DeploymentOptions
 import io.vertx.core.Verticle
@@ -42,10 +42,11 @@ fun <T> MessageConsumer<T>.suspendingHandler(
     val token = NewRelic.getAgent().transaction.token
     scope.launch {
         token.link()
-        Try { handler(message) }.failed().map {
-            logger.error(message.headers().marker, it.message, it)
-            message.fail(1, it.message)
-        }
+        Either.catch { handler(message) }
+            .mapLeft {
+                logger.error(message.headers().marker, it.message, it)
+                message.fail(1, it.message)
+            }
         token.expire()
     }
 }

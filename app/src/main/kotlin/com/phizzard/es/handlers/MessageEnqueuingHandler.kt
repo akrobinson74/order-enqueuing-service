@@ -1,16 +1,18 @@
 package com.phizzard.es.handlers
 
-import arrow.core.Try
+import arrow.core.Either
 import com.amazonaws.services.sqs.AmazonSQS
-import com.amazonaws.services.sqs.model.MessageAttributeValue
-import com.amazonaws.services.sqs.model.SendMessageRequest
+import com.phizzard.MESSAGE_CLASS
 import com.phizzard.es.GET_ORDER_ENDPOINT
 import com.phizzard.es.LOCATION_HEADER
 import com.phizzard.es.MONGO_ID
-import com.phizzard.es.ORDER_ENQUEUING_SERVICE
-import com.phizzard.es.SENDER
+import com.phizzard.es.PLATFORM_ID
+import com.phizzard.es.extensions.getMessageRequest
 import com.phizzard.es.models.ErrorBody
+import com.phizzard.models.MessageClass
+import com.phizzard.models.PartnerPlatform
 import io.vertx.ext.web.RoutingContext
+import org.apache.http.HttpStatus.SC_ACCEPTED
 import org.apache.http.HttpStatus.SC_CREATED
 import org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR
 import org.slf4j.LoggerFactory
@@ -24,26 +26,28 @@ class MessageEnqueuingHandler(
         logger.info("Entered MessageEnqueuingHandler::handle...")
 
         val mongoId = routingContext.get<String>(MONGO_ID)
+        val successStatusCode =
+            if (routingContext.get<String>(mongoId)?.equals("PUT") ?: false) SC_ACCEPTED else SC_CREATED
 
-        Try {
+        Either.catch {
+            logger.debug("Trying to enqueuing message with id ($mongoId)")
+
             val body = OrderMessage(mongoId).asJsonString()
-            val msgRequest = SendMessageRequest()
-                .withQueueUrl(queueUrl)
-                .withMessageBody(body)
-                .addMessageAttributesEntry(
-                    SENDER,
-                    MessageAttributeValue().withDataType("String").withStringValue(ORDER_ENQUEUING_SERVICE)
-                )
 
-            logger.debug("Trying to enqueuing message with id ($mongoId) and body: $body")
+            logger.debug("Message body: $body")
+
+            val messageClass = MessageClass.getMessageClassForModel(routingContext.get<String>(MESSAGE_CLASS)).name
+            val platformId = routingContext.get<PartnerPlatform>(PLATFORM_ID).name
+            val msgRequest =
+                getMessageRequest(json = body, messageClass = messageClass, platformId = platformId, url = queueUrl)
 
             val result = sqsClient.sendMessage(msgRequest)
 
             logger.debug("Succeeded in enqueuing message with id: $mongoId ($result)")
         }
-            .toEither()
             .mapLeft {
-                val message = "${it.cause ?: "Unable to write message metadata to queue for indeterminate reason :(!"}"
+                val message =
+                    "${it.message ?: "Unable to write message metadata to queue for indeterminate reason :(!"}"
 
                 logger.error("Failed to enqueue message: $message")
 
@@ -55,9 +59,9 @@ class MessageEnqueuingHandler(
             }
             .map {
                 routingContext.response()
-                    .setStatusCode(SC_CREATED)
+                    .setStatusCode(successStatusCode)
                     .putHeader(LOCATION_HEADER, "$GET_ORDER_ENDPOINT/$mongoId")
-                    .end(OrderCreationResponse(mongoId).asJsonString())
+                    .end(OrderEnqueuingResponse(mongoId).asJsonString())
             }
     }
 
@@ -66,5 +70,5 @@ class MessageEnqueuingHandler(
     }
 }
 
-data class OrderCreationResponse(val orderId: String)
+data class OrderEnqueuingResponse(val orderId: String)
 data class OrderMessage(val mongoId: String)

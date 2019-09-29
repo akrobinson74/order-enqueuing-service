@@ -1,6 +1,6 @@
 package com.phizzard.es
 
-import arrow.core.Try
+import arrow.core.Either
 import com.phizzard.es.verticles.BootstrapVerticle
 import io.vertx.core.Vertx
 import io.vertx.core.file.impl.FileResolver
@@ -18,10 +18,11 @@ suspend fun main(args: Array<String>) {
 
     val vertx = Vertx.vertx(vertxOptionsOf(metricsOptions = buildMetricsOptions()))
     val config = obtainConfiguration(vertx, configurationPath)
-    Try {
+    Either.catch {
         vertx.deployVerticleAwait(BootstrapVerticle::class.java.canonicalName, deploymentOptionsOf(config = config))
-    }.failed().map {
-        LoggerFactory.getLogger("main").error("deployment failed", it)
-        exitProcess(1)
     }
+        .mapLeft {
+            LoggerFactory.getLogger("main").error("deployment failed", it)
+            exitProcess(1)
+        }
 }

@@ -10,7 +10,7 @@ import java.io.InvalidObjectException
 private const val INVALID_ORDER_OBJECT_MSG = ""
 
 class ErrorHandlers {
-        fun handleOpenApiValidationError(routingContext: RoutingContext) =
+    fun handleOpenApiValidationError(routingContext: RoutingContext) =
         routingContext.failure().message
             ?.let { message ->
                 logger.error("Invalid input JSON: $message")

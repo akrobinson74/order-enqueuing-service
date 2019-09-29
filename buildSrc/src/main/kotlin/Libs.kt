@@ -45,6 +45,9 @@ object Libs {
     const val mockito_kotlin: String = "com.nhaarman.mockitokotlin2:mockito-kotlin:" +
             Versions.mockito_kotlin
 
+    const val orderservice_common: String = "com.phizzard:orderservice-common:" +
+            Versions.orderservice_common
+
     /**
      * https://github.com/square/okhttp */
     const val mockwebserver: String = "com.squareup.okhttp3:mockwebserver:" + Versions.mockwebserver
@@ -70,6 +73,11 @@ object Libs {
             Versions.io_gitlab_arturbosch_detekt
 
     /**
+     * http://www.github.com/kotlintest/kotlintest */
+    const val kotlintest_assertions: String = "io.kotlintest:kotlintest-assertions:" +
+            Versions.kotlintest_assertions
+
+    /**
      * https://github.com/micrometer-metrics/micrometer */
     const val micrometer_registry_new_relic: String =
             "io.micrometer:micrometer-registry-new-relic:" + Versions.io_micrometer
@@ -82,6 +90,8 @@ object Libs {
     /**
      * http://mockk.io */
     const val mockk: String = "io.mockk:mockk:" + Versions.mockk
+
+    const val vertx_auth_jwt: String = "io.vertx:vertx-auth-jwt:" + Versions.io_vertx
 
     const val vertx_config_yaml: String = "io.vertx:vertx-config-yaml:" + Versions.io_vertx
 
@@ -162,6 +172,10 @@ object Libs {
     /**
      * https://junit.org/junit5/ */
     const val junit_bom: String = "org.junit:junit-bom:" + Versions.junit_bom
+
+    /**
+     * https://github.com/mockito/mockito */
+    const val mockito_core: String = "org.mockito:mockito-core:" + Versions.mockito_core
 
     const val org_owasp_dependencycheck_gradle_plugin: String =
             "org.owasp.dependencycheck:org.owasp.dependencycheck.gradle.plugin:" +

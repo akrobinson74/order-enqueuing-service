@@ -1,7 +1,11 @@
 package com.phizzard.es
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectWriter
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.vertx.config.ConfigRetriever
 import io.vertx.core.Vertx
@@ -10,7 +14,7 @@ import io.vertx.core.json.JsonObject
 import io.vertx.kotlin.config.configRetrieverOptionsOf
 import io.vertx.kotlin.config.configStoreOptionsOf
 import io.vertx.kotlin.config.getConfigAwait
-import io.vertx.kotlin.core.json.JsonObject
+import io.vertx.kotlin.core.json.jsonObjectOf
 
 data class CorsConfig(
     val allowedHeaders: Set<String>,
@@ -20,25 +24,6 @@ data class CorsConfig(
 
 val JsonObject.corsConfig: CorsConfig
     get() = getJsonObject("cors").mapTo(CorsConfig::class.java)
-
-data class ElasticsearchConfig(
-    val domainARN: String,
-    val endpoint: String,
-    val kibana: String,
-    val version: String
-)
-
-val JsonObject.elasticSearch: ElasticsearchConfig
-    get() = getJsonObject("elasticSearch").mapTo(ElasticsearchConfig::class.java)
-
-data class MongoConfig(
-    val connection_string: String,
-    val db_name: String,
-    val host: String,
-    val password: String,
-    val port: Int,
-    val username: String
-)
 
 val JsonObject.mongoConfig: JsonObject
     get() = getJsonObject("mongoConfig")
@@ -62,7 +47,7 @@ suspend fun obtainConfiguration(vertx: Vertx, configurationPath: String): JsonOb
     val yamlStore = configStoreOptionsOf(
         type = "file",
         format = "yaml",
-        config = JsonObject("path" to configurationPath)
+        config = jsonObjectOf("path" to configurationPath)
     )
     return ConfigRetriever
         .create(vertx, configRetrieverOptionsOf(stores = listOf(envStore, yamlStore)))
@@ -75,6 +60,9 @@ fun JsonObject.overrideConfigValuesWithEnvVars(configFieldToEnvVarMap: Map<Strin
     return this
 }
 
-val NULL_QUERY_PROJECTION: JsonObject? = null
 val DEFAULT_MAPPER: ObjectMapper = jacksonObjectMapper()
+    .registerModules(JavaTimeModule())
+    .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
+    .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 val PRETTY_PRINTING_MAPPER: ObjectWriter = DEFAULT_MAPPER.copy().writerWithDefaultPrettyPrinter()

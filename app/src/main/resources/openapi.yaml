@@ -2,12 +2,18 @@ openapi: 3.0.0
 info:
   description: "Enumeration of the endpoints the OrderEnqueuingService exposes and the expected data transfer objects"
   title: "OrderEnqueuingService OpenAPI Spec"
-  version: "1.0.2"
+  version: "1.0.3"
 paths:
-  /order:
+  /{platformId}/order:
     post:
       summary: "Create a new Order resource to be enqued for processing"
       operationId: createOrder
+      parameters:
+      - in: path
+        name: platformId
+        required: true
+        schema:
+         type: string
       requestBody:
         required: true
         content:
@@ -53,6 +59,106 @@ paths:
                 $ref: '#/components/schemas/Order'
         '404':
           description: NOT_FOUND.  No Order resource corresponds to ${orderId}
+  /{platformId}/order/{orderId}:
+    patch:
+      summary: "Cancel or Return an OrderItem"
+      operationId: changeOrderItem
+      parameters:
+        - in: path
+          name: platformId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderItemPatch'
+      responses:
+        '202':
+          description: ACCEPTED.  The update has been applied and successfully propagated
+        '404':
+          description: NOT_FOUND.  The targeted resource doesn't exists in our DB.
+        '500':
+          description: ERROR.  The operation resulted in an internal error.
+    put:
+      summary: "Update the status of an existing Order"
+      operationId: putStatus
+      parameters:
+        - in: path
+          name: platformId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusUpdate'
+      responses:
+        '202':
+          description: ACCEPTED.  The update to status has been accepted and propagated.
+        '404':
+          description: NOT_FOUND.  The targeted resource doesn't exists in our DB.
+        '500':
+          description: ERROR.  The operation resulted in an internal error.
+  /{platformId}/orders:
+    get:
+      summary: "Get all orders for the current user"
+      operationId: getAllOrders
+      parameters:
+      - in: path
+        name: platformId
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: batchSize
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: before
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: end
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: limit
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: skip
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK.  Return an Array of Order objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersCollection'
+        '404':
+          description: NOT_FOUND.  The current user has no orders
+
   /health:
     get:
       summary: Health Check endpoint
@@ -61,7 +167,7 @@ paths:
         '200':
           description: Service is OK
         '503':
-          description: Service is KO
+          description: Service is KO'd
   /metrics:
     get:
       summary: Endpoint for Prometheus metrics
@@ -184,6 +290,43 @@ components:
           description: The manufacturer and/or vendor of this product; used to split and group orderItems together
           example: kjus
           type: string
+
+    OrderItemPatch:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [CANCEL, RETURN]
+        item:
+          $ref: '#/components/schemas/OrderItem'
+        itemIndex:
+          type: integer
+      required:
+        - action
+
+
+    OrdersCollection:
+      type: array
+      items:
+        $ref: '#/components/schemas/Order'
+        minItems: 1
+
+    OrderStatus:
+      type: string
+      enum:
+        - APPROVED
+        - COMPLETED
+        - ERROR
+        - INITIAL
+        - MP_CANCELLATION
+        - OPEN
+        - PROCESSING
+
+    StatusUpdate:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/OrderStatus'
 
     StoreContact:
       type: object

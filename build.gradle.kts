@@ -25,6 +25,12 @@ allprojects {
         jcenter()
         google()
         mavenCentral()
+        maven {
+            url = uri("s3://phizzard-jars/maven")
+            authentication {
+                val awsIm by registering(AwsImAuthentication::class)
+            }
+        }
     }
 }
 subprojects {
@@ -43,14 +49,19 @@ subprojects {
     dependencies {
         api(Libs.arrow_core)
         api(Libs.org_jetbrains_kotlin_kotlin_stdlib_jdk8)
+        testCompile(Libs.junit_jupiter_api)
         testImplementation(Libs.junit_bom)
         testImplementation(Libs.assertj_core)
         testImplementation(Libs.junit_jupiter_api)
         testImplementation(Libs.junit_jupiter_params)
+        testImplementation(Libs.kotlintest_assertions)
+        testImplementation(Libs.mockk)
+        testImplementation(Libs.mockito_core)
         testImplementation(Libs.mockito_kotlin) {
             exclude(module = "kotlin-reflect")
         }
         testImplementation(Libs.mockwebserver)
+        testImplementation(Libs.junit_jupiter)
         testImplementation(Libs.vertx_junit5)
         testRuntimeOnly(Libs.junit_jupiter_engine)
         ktlint(Libs.ktlint)
@@ -58,6 +69,9 @@ subprojects {
 
     tasks {
         getByName<Test>("test") {
+            extensions.configure(JacocoTaskExtension::class) {
+                excludes = listOf("*AppKt*","*ExtensionsKt*","*MetricsKt*")
+            }
             useJUnitPlatform {
                 excludeTags("integration")
             }
@@ -111,7 +125,7 @@ subprojects {
         val ktlintArgs = listOf("-F", "$projectDir/src/**/*.kt")
         create<JavaExec>("ktlintCheck") {
             description = "Runs ktlint on all kotlin sources in this project."
-            tasks["check"].group?.let { group = it }
+//            tasks["check"].group?.let { group = it }
             main = ktlintMain
             classpath = ktlint
             args = ktlintArgs.drop(1)
@@ -140,8 +154,8 @@ subprojects {
 
 tasks {
     create<JacocoReport>("jacocoRootTestReport") {
-        classDirectories = files("${project(":app").buildDir}/classes/kotlin/main")
-        sourceDirectories = files("${project(":app").projectDir}/src/kotlin/main")
+        getClassDirectories().setFrom(files("${project(":app").buildDir}/classes/kotlin/main"))
+        getSourceDirectories().setFrom(files("${project(":app").projectDir}/src/kotlin/main"))
 
         val validJacocoFileNames = listOf("test.exec", "integration-test.exec")
         val jacocoTestFiles = subprojects.map { project ->
@@ -151,7 +165,7 @@ tasks {
             .toTypedArray()
 
         logger.info("Aggregating next JaCoCo Coverage files: {}", jacocoTestFiles)
-        executionData = files(*jacocoTestFiles)
+        getExecutionData().setFrom(files(*jacocoTestFiles))
 
         reports.csv.isEnabled = true
     }

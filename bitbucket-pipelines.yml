@@ -68,7 +68,7 @@ pipelines:
           - ./gradlew :app:shadowJar
         artifacts:
           - docker/app/build/*.*
-          - docker/app/build/newrelic-5.3.0/*
+          - docker/app/build/newrelic-*/*
     - step:
         name: Build Docker Image
         caches:

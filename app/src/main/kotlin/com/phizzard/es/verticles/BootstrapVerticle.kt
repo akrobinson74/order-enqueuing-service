@@ -21,6 +21,7 @@ import com.phizzard.es.OPEN_API_PATH
 import com.phizzard.es.SqsConfig
 import com.phizzard.es.corsConfig
 import com.phizzard.es.extensions.requestMarker
+import com.phizzard.es.handlers.AuthHandler
 import com.phizzard.es.handlers.ErrorHandlers
 import com.phizzard.es.handlers.MessageEnqueuingHandler
 import com.phizzard.es.handlers.OrderRetrievalHandler
@@ -53,59 +54,34 @@ class BootstrapVerticle : CoroutineVerticle() {
     private val mongoConfig: JsonObject by lazy { config.mongoConfig }
     private val sqsConfig: SqsConfig by lazy { config.sqsConfig }
 
+    private val mongoClient: MongoClient by lazy { MongoClient.createShared(vertx, mongoConfig) }
+    private val orderRetrievalHandler: OrderRetrievalHandler by lazy { OrderRetrievalHandler(mongoClient) }
+    private val sqsClient: AmazonSQS by lazy {
+        AmazonSQSClientBuilder.standard()
+            .withCredentials(
+                AWSStaticCredentialsProvider(BasicAWSCredentials(sqsConfig.accessKeyId, sqsConfig.secretAccessKey))
+            )
+            .withEndpointConfiguration(EndpointConfiguration(sqsConfig.serviceEndpoint, sqsConfig.signingRegion))
+            .build()
+    }
+
+    init {
+        registerJacksonModules()
+    }
+
     override suspend fun start() {
         logger.info("Starting BootstrapVerticle")
 
         vertx.eventBus().consumer<Int>(BOOTSTRAP_HEALTH) { it.reply(0) }
 
-        registerJacksonModules()
-
-        val routerOptions = routerFactoryOptionsOf(
-            mountNotImplementedHandler = true
-        )
-
-        val mongoClient = MongoClient.createShared(vertx, mongoConfig)
-        val orderRetrievalHandler = OrderRetrievalHandler(mongoClient)
-        val sqsClient: AmazonSQS = AmazonSQSClientBuilder.standard()
-            .withCredentials(
-                AWSStaticCredentialsProvider(BasicAWSCredentials(sqsConfig.accessKeyId, sqsConfig.secretAccessKey))
-            )
-            .withEndpointConfiguration(
-                EndpointConfiguration(sqsConfig.serviceEndpoint, sqsConfig.signingRegion)
-            )
-            .build()
-
         val router = createAwait(vertx, OPEN_API_PATH)
-            .addFailureHandlerByOperationId(CREATE_ORDER_OPERATION_ID, ErrorHandlers()::defaultErrorHandler)
-            .addHandlerByOperationId(HEALTH_CHECK, buildHealthCheck(vertx))
-            .addHandlerByOperationId(METRICS, ::prometheusHandler)
-            .addSuspendingHandlerByOperationId(
-                handler = OrderStorageHandler(mongoClient)::handleNewOrder,
-                operationId = CREATE_ORDER_OPERATION_ID
+            .addSuspendingHandlers()
+            .addHandlers()
+            .setOptions(
+                routerFactoryOptionsOf(
+                    mountNotImplementedHandler = true
+                )
             )
-            .addSuspendingHandlerByOperationId(
-                handler = MessageEnqueuingHandler(
-                    queueUrl = sqsClient.getQueueUrl(sqsConfig.queueName).queueUrl,
-                    sqsClient = sqsClient
-                )::handle,
-                operationId = CREATE_ORDER_OPERATION_ID
-            )
-            .addSuspendingHandlerByOperationId(
-                handler = orderRetrievalHandler::handleGetOrderById,
-                operationId = GET_ORDER_OPERATION_ID
-            )
-            .addSuspendingHandlerByOperationId(
-                handler = orderRetrievalHandler::handleAllOrdersForUserId,
-                operationId = GET_ALL_ORDERS_OPERATION_ID
-            )
-            .addGlobalHandler(
-                CorsHandler.create(corsConfig.allowedOriginPattern)
-                    .allowedHeaders(corsConfig.allowedHeaders)
-                    .allowedMethods(corsConfig.allowedMethods)
-            )
-            .addGlobalHandler(LoggerHandlerImpl(true, LoggerFormat.DEFAULT))
-            .setBodyHandler(BodyHandler.create(false))
-            .setOptions(routerOptions)
             .router
             .errorHandler(SC_BAD_REQUEST, ErrorHandlers()::handleOpenApiValidationError)
             .errorHandler(SC_INTERNAL_SERVER_ERROR, ErrorHandlers()::defaultErrorHandler)
@@ -133,6 +109,39 @@ class BootstrapVerticle : CoroutineVerticle() {
             token.expire()
         }
     }
+
+    private fun OpenAPI3RouterFactory.addHandlers() =
+        this.addHandlerByOperationId(HEALTH_CHECK, buildHealthCheck(vertx))
+            .addHandlerByOperationId(METRICS, ::prometheusHandler)
+            .addFailureHandlerByOperationId(CREATE_ORDER_OPERATION_ID, ErrorHandlers()::defaultErrorHandler)
+            .addGlobalHandler(
+                CorsHandler.create(corsConfig.allowedOriginPattern)
+                    .allowedHeaders(corsConfig.allowedHeaders)
+                    .allowedMethods(corsConfig.allowedMethods)
+            )
+            .addGlobalHandler(LoggerHandlerImpl(true, LoggerFormat.DEFAULT))
+            .setBodyHandler(BodyHandler.create(false))
+            .addSecurityHandler("auth", AuthHandler()::handle)
+
+    private fun OpenAPI3RouterFactory.addSuspendingHandlers() = this.addSuspendingHandlerByOperationId(
+        handler = OrderStorageHandler(mongoClient)::handleNewOrder,
+        operationId = CREATE_ORDER_OPERATION_ID
+    )
+        .addSuspendingHandlerByOperationId(
+            handler = MessageEnqueuingHandler(
+                queueUrl = sqsClient.getQueueUrl(sqsConfig.queueName).queueUrl,
+                sqsClient = sqsClient
+            )::handle,
+            operationId = CREATE_ORDER_OPERATION_ID
+        )
+        .addSuspendingHandlerByOperationId(
+            handler = orderRetrievalHandler::handleGetOrderById,
+            operationId = GET_ORDER_OPERATION_ID
+        )
+        .addSuspendingHandlerByOperationId(
+            handler = orderRetrievalHandler::handleAllOrdersForUserId,
+            operationId = GET_ALL_ORDERS_OPERATION_ID
+        )
 
     companion object {
         private val logger = LoggerFactory.getLogger(BootstrapVerticle::class.java)

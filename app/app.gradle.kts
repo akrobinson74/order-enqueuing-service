@@ -17,6 +17,7 @@ dependencies {
     api(Libs.micrometer_registry_prometheus)
     api(Libs.newrelic_api)
     api(Libs.orderservice_common)
+    api(Libs.vertx_auth_jwt)
     api(Libs.vertx_config)
     api(Libs.vertx_config_yaml)
     api(Libs.vertx_core)

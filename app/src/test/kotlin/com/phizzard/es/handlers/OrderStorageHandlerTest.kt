@@ -5,6 +5,7 @@ import com.phizzard.es.EMBEDDED_MONGO_HOST
 import com.phizzard.es.EMBEDDED_MONGO_PORT
 import com.phizzard.es.EmbeddedMongoDBTestInstance
 import com.phizzard.es.GET_ORDER_ENDPOINT
+import com.phizzard.es.LISTENING_PORT
 import com.phizzard.es.LOCATION_HEADER
 import com.phizzard.es.MONGO_ID
 import com.phizzard.es.ORDERS_COLLECTION_NAME
@@ -85,32 +86,27 @@ class OrderStorageHandlerTest {
                         .end(OrderEnqueuingResponse(mongoId ?: "").asJsonString())
                 }
             }
-            val orderHandler = OrderStorageHandler(mongoClient)
 
             val router = Router.router(vertx)
             router.post("/:platformId/order")
                 .handler(BodyHandler.create())
                 .handler {
                     it.pathParams().put("platformId", "PSG")
-                    launch {
-                        (orderHandler::handleNewOrder)(it)
-                    }
+                    launch { (OrderStorageHandler(mongoClient)::handleNewOrder)(it) }
                 }
                 .handler { launch { (enqueuingHandler::handle)(it) } }
 
-            val server = vertx.createHttpServer().requestHandler(router).listenAwait(54321)
-
-            val response = WebClient.create(vertx).post(54321, "localhost", "/{platformId}/order")
+            val server = vertx.createHttpServer().requestHandler(router).listenAwait(LISTENING_PORT)
+            val response = WebClient.create(vertx).post(LISTENING_PORT, "localhost", "/{platformId}/order")
                 .putHeader("Content-Type", "application/json")
                 .sendJsonObjectAwait(JsonObject(SAMPLE_ORDER))
 
             context.verify {
-                response.statusCode() shouldBe 201
+                response.statusCode() shouldBe SC_CREATED
                 response.headers()["location"] shouldBe "/order/$mongoId"
             }
 
-            server.close()
-            context.completeNow()
+            server.close(); context.completeNow()
         }
 
     @Test
@@ -155,9 +151,9 @@ class OrderStorageHandlerTest {
                 }
                 .handler { launch { (enqueuingHandler::handle)(it) } }
 
-            val server = vertx.createHttpServer().requestHandler(router).listenAwait(54321)
+            val server = vertx.createHttpServer().requestHandler(router).listenAwait(LISTENING_PORT)
 
-            val response = WebClient.create(vertx).put(54321, "localhost", "/order/{orderId}")
+            val response = WebClient.create(vertx).put(LISTENING_PORT, "localhost", "/order/{orderId}")
                 .putHeader("Content-Type", "application/json")
                 .putHeader("userId", "PSG")
                 .addQueryParam("orderId", "1")
@@ -166,7 +162,7 @@ class OrderStorageHandlerTest {
             val mongoOrderList = mongoClient.findAwait(ORDERS_COLLECTION_NAME, "1".getFindByIdQuery())
 
             context.verify {
-                response.statusCode() shouldBe 202
+                response.statusCode() shouldBe SC_ACCEPTED
                 response.headers()["location"] shouldBe "/order/1"
                 mongoOrderList[0].getString("status") shouldBe OrderStatus.APPROVED.name
             }

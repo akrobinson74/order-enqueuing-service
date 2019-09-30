@@ -24,29 +24,32 @@ suspend fun MongoClient.getOrdersForUser(
 ): List<StoredOrder> =
     when {
         end != null && start != null -> {
-            findWithOptionsAwait(
-                ORDERS_COLLECTION_NAME,
-                JsonObject().put(
-                    "\$and", jsonArrayOf(
-                        JsonObject().put("userId", userId),
-                        JsonObject().put(
-                            MONGO_ID_FIELD_NAME, JsonObject()
-                                .put("\$gte", JsonObject().put("\$oid", ObjectId(Date.from(start)).toHexString()))
-                                .put("\$lte", JsonObject().put("\$oid", ObjectId(Date.from(end)).toHexString()))
-                        )
-                    )
-                ),
-                findOptions
-            )
+            findWithOptionsAwait(ORDERS_COLLECTION_NAME, constructFindQuery(end, start, userId), findOptions)
                 .map {
                     it.mapTo(StoredOrder::class.java)
                 }
         }
 
-        else
-        -> findWithOptionsAwait(ORDERS_COLLECTION_NAME, JsonObject().put("userId", userId), findOptions).map {
-            it.mapTo(StoredOrder::class.java)
-        }
+        else -> findWithOptionsAwait(ORDERS_COLLECTION_NAME, JsonObject().put("userId", userId), findOptions)
+            .map {
+                it.mapTo(StoredOrder::class.java)
+            }
     }
+
+private fun constructFindQuery(
+    end: Instant,
+    start: Instant,
+    userId: String
+): JsonObject = JsonObject().put(
+    "\$and", jsonArrayOf(
+        JsonObject().put("userId", userId),
+        JsonObject().put(
+            MONGO_ID_FIELD_NAME,
+            JsonObject()
+                .put("\$gte", JsonObject().put("\$oid", ObjectId(Date.from(start)).toHexString()))
+                .put("\$lte", JsonObject().put("\$oid", ObjectId(Date.from(end)).toHexString()))
+        )
+    )
+)
 
 fun String.getFindByIdQuery(): JsonObject = JsonObject().put("_id", this)

@@ -4,8 +4,11 @@ import com.amazonaws.services.sqs.AmazonSQS
 import com.amazonaws.services.sqs.model.SendMessageResult
 import com.phizzard.MESSAGE_CLASS
 import com.phizzard.es.GET_ORDER_ENDPOINT
+import com.phizzard.es.LISTENING_PORT
+import com.phizzard.es.LOCALHOST
 import com.phizzard.es.LOCATION_HEADER
 import com.phizzard.es.MONGO_ID
+import com.phizzard.es.ORDER_PATH
 import com.phizzard.es.PLATFORM_ID
 import com.phizzard.es.extensions.getMessageRequest
 import com.phizzard.es.models.ErrorBody
@@ -27,6 +30,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.apache.http.HttpStatus.SC_ACCEPTED
 import org.apache.http.HttpStatus.SC_CREATED
+import org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import javax.ws.rs.core.HttpHeaders.CONTENT_TYPE
@@ -63,7 +67,7 @@ class MessageEnqueuingHandlerTest {
             .sendAwait()
 
         context.verify {
-            response.statusCode() shouldBe 500
+            response.statusCode() shouldBe SC_INTERNAL_SERVER_ERROR
             val responseBody = response.bodyAsJsonObject().mapTo(ErrorBody::class.java)
             responseBody.errors.size shouldBe 1
             responseBody.msg shouldBe ""
@@ -103,7 +107,7 @@ class MessageEnqueuingHandlerTest {
                 .sendAwait()
 
             context.verify {
-                response.statusCode() shouldBe 500
+                response.statusCode() shouldBe SC_INTERNAL_SERVER_ERROR
                 val responseBody = response.bodyAsJsonObject().mapTo(ErrorBody::class.java)
                 responseBody.errors.size shouldBe 1
                 responseBody.msg shouldBe ""

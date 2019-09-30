@@ -32,6 +32,25 @@ import org.testcontainers.containers.wait.strategy.Wait
 import java.math.BigInteger
 import java.time.Instant
 
+const val ONE = 1
+const val TWO = 2
+const val THREE = 3
+const val FOUR = 4
+const val FIVE = 5
+const val LISTENING_PORT = 54321
+const val LOCALHOST = "localhost"
+const val MONGO_EXTENSION_CLASS = "com.phizzard.es.extensions.MongoClientExtensionsKt"
+const val ORDER_PATH = "/order"
+const val ORDERS_PATH = "/orders"
+const val TRANSACTION_DATE = "transactionDate"
+
+const val ADAMS_DOB_EPOCH_SECONDS = 143398800000L
+const val ZERO_DAYS = 0L
+const val TEN_YEARS_IN_DAYS = 3653L
+const val TWENTY_YEARS_IN_DAYS = 7305L
+const val THIRTY_YEARS_IN_DAYS = 10968L
+const val FORTY_YEARS_IN_DAYS = 14620L
+
 const val SAMPLE_ADDRESS = """
 {
   "city": "Berlin",
@@ -318,4 +337,12 @@ val testConfig = jsonObjectOf(
             signingRegion = "elasticmq"
         )
     )
+)
+
+val deltaDaysList = listOf(
+    ZERO_DAYS,
+    TEN_YEARS_IN_DAYS,
+    TWENTY_YEARS_IN_DAYS,
+    THIRTY_YEARS_IN_DAYS,
+    FORTY_YEARS_IN_DAYS
 )

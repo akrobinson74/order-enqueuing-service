@@ -8,7 +8,7 @@ COPY build/config-dev.yml /opt/config.yml
 COPY build/order-enqueuing-service.jar .
 
 # NewRelic java agent
-ADD build/newrelic-5.3.0/ /opt/newrelic/
+ADD build/newrelic-5.7.0/ /opt/newrelic/
 RUN mkdir -p /opt/newrelic/logs
 
 EXPOSE 9080

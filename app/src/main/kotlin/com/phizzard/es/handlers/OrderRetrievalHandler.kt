@@ -47,34 +47,16 @@ class OrderRetrievalHandler(private val mongoClient: MongoClient) {
         .getOrElse { }
 
     suspend fun handleAllOrdersForUserId(context: RoutingContext) = Either.catch {
-        val platform = Either.catch {
-            PartnerPlatform.valueOf(
-                context.pathParams().get(PARTNER_ID_PATH_PARAM_NAME)?.toUpperCase() ?: "platformId Not passed"
-            )
-        }
-            .getOrHandle {
-                throw MissingArgumentException("Missing or invalid partnerId: ${it.localizedMessage}")
-            }
+        val platform = context.extractPartnerPlatform()
+        val (batchSize, limit, skip) = getHandleAllRequestParams(context)
+        val findOptions = buildFindOptions(batchSize, limit, skip)
 
-        val batchSize = context.request().getParam("batchSize")
-        val limit = context.request().getParam("limit")
-        val skip = context.request().getParam("skip")
-        val findOptions = FindOptions()
-            .setBatchSize(batchSize?.toInt() ?: DEFAULT_BATCH_SIZE)
-            .setLimit(limit?.toInt() ?: DEFAULT_RESULTS_LIMIT)
-            .setSkip(skip?.toInt() ?: DEFAULT_RESULTS_TO_SKIP)
-
-        val (before, after) =
-            context.request().getParam("before") to context.request().getParam("after")
+        val (before, after) = context.request().getParam("before") to
+            context.request().getParam("after")
         val afterDateTime = if (!after.isNullOrEmpty()) Instant.from(ISO_INSTANT.parse(after)) else null
         val beforeDateTime = if (!before.isNullOrEmpty()) Instant.from(ISO_INSTANT.parse(before)) else null
 
-        val orders = mongoClient.getOrdersForUser(
-            userId = platform.name,
-            findOptions = findOptions,
-            start = afterDateTime,
-            end = beforeDateTime
-        )
+        val orders = getOrdersForUserWithParams(afterDateTime, beforeDateTime, findOptions, platform)
 
         logger.info("Obtained {} order objects", orders.size)
 
@@ -82,50 +64,83 @@ class OrderRetrievalHandler(private val mongoClient: MongoClient) {
             .setStatusCode(SC_OK)
             .end(orders.asJsonString(true))
     }
-        .mapLeft {
-            logger.error("Retreive all orders failed: {}", it.localizedMessage)
+        .handleGetAllErrors(context)
 
-            when {
-                it is MissingArgumentException -> HttpStatus.SC_BAD_REQUEST to it.msg
-                else -> HttpStatus.SC_INTERNAL_SERVER_ERROR to "Please contact backend@phizzard.com about this error."
-            }
-                .let {
-                    context.response()
-                        .setStatusCode(it.first)
-                        .end(it.second)
-                }
-        }
-        .getOrElse { }
+    private suspend fun getOrdersForUserWithParams(
+        afterDateTime: Instant?,
+        beforeDateTime: Instant?,
+        findOptions: FindOptions,
+        platform: PartnerPlatform
+    ): List<StoredOrder> = mongoClient.getOrdersForUser(
+        userId = platform.name,
+        findOptions = findOptions,
+        start = afterDateTime,
+        end = beforeDateTime
+    )
+
+    private fun getHandleAllRequestParams(context: RoutingContext): Triple<String?, String?, String?> =
+        listOf("batchSize", "limit", "skip").map { context.request().getParam(it) ?: null }.toTriple()
+
+    private fun buildFindOptions(
+        batchSize: String?,
+        limit: String?,
+        skip: String?
+    ): FindOptions = FindOptions()
+        .setBatchSize(batchSize?.toInt() ?: DEFAULT_BATCH_SIZE)
+        .setLimit(limit?.toInt() ?: DEFAULT_RESULTS_LIMIT)
+        .setSkip(skip?.toInt() ?: DEFAULT_RESULTS_TO_SKIP)
 
     private fun handleFindAwaitResult(
         context: RoutingContext,
         objectList: List<StoredOrder>,
         expectedResults: Int = 1
-    ) =
-        when {
-            objectList.isNotEmpty() && objectList.size == expectedResults ->
-                context.response()
-                    .setStatusCode(SC_OK)
-                    .end(if (expectedResults == 1) objectList[0].asJsonString() else objectList.asJsonString())
-            else ->
-                context.response()
-                    .setStatusCode(SC_NOT_FOUND)
-                    .end(
-                        ErrorBody(
-                            listOf("No Order found with orderId: ${context.pathParams().get(ORDER_ID_PATH_PARAM_NAME)}")
-                        )
-                            .asJsonString(prettyPrint = true)
-                    )
-        }
+    ) = when {
+        objectList.isNotEmpty() && objectList.size == expectedResults -> context.response()
+            .setStatusCode(SC_OK)
+            .end(if (expectedResults == 1) objectList[0].asJsonString() else objectList.asJsonString())
+
+        else -> context.response()
+            .setStatusCode(SC_NOT_FOUND)
+            .end(
+                ErrorBody(listOf("No Order found with orderId: ${context.pathParams().get(ORDER_ID_PATH_PARAM_NAME)}"))
+                    .asJsonString(prettyPrint = true)
+            )
+    }
 
     companion object {
         private val logger = getLogger<OrderRetrievalHandler>()
     }
 }
 
+fun <T> List<T>.toTriple(): Triple<T, T, T> = takeUnless { it.isEmpty() }
+    ?.let { it[0] to it[1] toTriple it[2] }
+    ?: throw IllegalArgumentException("List<T> contains fewer than 3 elements!")
+
+infix fun <T> Pair<T, T>.toTriple(b: T) = Triple(this.first, this.second, b)
+
 fun <T> T.asJsonString(prettyPrint: Boolean = false): String = when (prettyPrint) {
     true -> PRETTY_PRINTING_MAPPER.writeValueAsString(this)
     else -> DEFAULT_MAPPER.writeValueAsString(this)
 }
+
+private fun Either<Throwable, Unit>.handleGetAllErrors(context: RoutingContext) = mapLeft {
+    getLogger<OrderRetrievalHandler>().error("Retreive all orders failed: {}", it.localizedMessage)
+    when {
+        it is MissingArgumentException -> HttpStatus.SC_BAD_REQUEST to it.msg
+        else -> HttpStatus.SC_INTERNAL_SERVER_ERROR to "Please contact backend@phizzard.com about this error."
+    }
+        .let {
+            context.response()
+                .setStatusCode(it.first)
+                .end(it.second)
+        }
+}
+    .getOrElse {}
+
+suspend fun RoutingContext.extractPartnerPlatform(): PartnerPlatform = Either.catch {
+    val partnerIdPathParam = pathParams().get(PARTNER_ID_PATH_PARAM_NAME)?.toUpperCase() ?: "platformId Not passed"
+    PartnerPlatform.valueOf(partnerIdPathParam)
+}
+    .getOrHandle { throw MissingArgumentException("Missing or invalid partnerId: ${it.localizedMessage}") }
 
 class MissingArgumentException(val msg: String) : RuntimeException(msg)

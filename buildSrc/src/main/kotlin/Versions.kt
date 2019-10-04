@@ -24,7 +24,7 @@ object Versions {
 
     const val mockito_kotlin: String = "2.2.0" // available: "2.2.0"
 
-    const val orderservice_common: String = "0.9.56" // available: "0.9.56"
+    const val orderservice_common: String = "0.9.67" // available: "0.9.56"
 
     const val mockwebserver: String = "4.2.0" // available: "4.2.0"
 

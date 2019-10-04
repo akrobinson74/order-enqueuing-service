@@ -2,6 +2,7 @@ package com.phizzard.es
 
 import arrow.core.Either
 import com.phizzard.es.verticles.BootstrapVerticle
+import com.phizzard.obtainConfiguration
 import io.vertx.core.Vertx
 import io.vertx.core.file.impl.FileResolver
 import io.vertx.kotlin.core.deployVerticleAwait

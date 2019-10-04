@@ -8,18 +8,20 @@ import com.amazonaws.services.sqs.AmazonSQS
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.newrelic.api.agent.NewRelic
+import com.phizzard.CorsConfig
+import com.phizzard.JWTConfig
+import com.phizzard.SqsConfig
+import com.phizzard.corsConfig
 import com.phizzard.es.BOOTSTRAP_HEALTH
 import com.phizzard.es.CREATE_ORDER_OPERATION_ID
-import com.phizzard.es.CorsConfig
 import com.phizzard.es.DEFAULT_HTTP_PORT
 import com.phizzard.es.GET_ALL_ORDERS_OPERATION_ID
 import com.phizzard.es.GET_ORDER_OPERATION_ID
+import com.phizzard.es.HANDLE_AUTH_OPERATION_ID
 import com.phizzard.es.HEALTH_CHECK
 import com.phizzard.es.HTTP_PORT
 import com.phizzard.es.METRICS
 import com.phizzard.es.OPEN_API_PATH
-import com.phizzard.es.SqsConfig
-import com.phizzard.es.corsConfig
 import com.phizzard.es.extensions.requestMarker
 import com.phizzard.es.handlers.AuthHandler
 import com.phizzard.es.handlers.ErrorHandlers
@@ -27,16 +29,21 @@ import com.phizzard.es.handlers.MessageEnqueuingHandler
 import com.phizzard.es.handlers.OrderRetrievalHandler
 import com.phizzard.es.handlers.OrderStorageHandler
 import com.phizzard.es.handlers.buildHealthCheck
-import com.phizzard.es.mongoConfig
 import com.phizzard.es.prometheusHandler
-import com.phizzard.es.sqsConfig
+import com.phizzard.jwt
+import com.phizzard.mongoConfig
+import com.phizzard.sqsConfig
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
+import io.vertx.ext.auth.PubSecKeyOptions
+import io.vertx.ext.auth.jwt.JWTAuth
+import io.vertx.ext.auth.jwt.JWTAuthOptions
 import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.api.contract.openapi3.OpenAPI3RouterFactory
 import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.ext.web.handler.CorsHandler
+import io.vertx.ext.web.handler.JWTAuthHandler
 import io.vertx.ext.web.handler.LoggerFormat
 import io.vertx.ext.web.handler.impl.LoggerHandlerImpl
 import io.vertx.kotlin.core.http.listenAwait
@@ -51,9 +58,18 @@ import org.slf4j.LoggerFactory
 class BootstrapVerticle : CoroutineVerticle() {
 
     private val corsConfig: CorsConfig by lazy { config.corsConfig }
+    private val jwtConfig: JWTConfig by lazy { config.jwt }
     private val mongoConfig: JsonObject by lazy { config.mongoConfig }
     private val sqsConfig: SqsConfig by lazy { config.sqsConfig }
 
+    private val jwtAuthOptions: JWTAuthOptions by lazy {
+        JWTAuthOptions().addPubSecKey(
+            PubSecKeyOptions()
+                .setAlgorithm(jwtConfig.algorithm)
+                .setPublicKey(jwtConfig.publicKey)
+                .setSecretKey(jwtConfig.privateKey)
+        )
+    }
     private val mongoClient: MongoClient by lazy { MongoClient.createShared(vertx, mongoConfig) }
     private val orderRetrievalHandler: OrderRetrievalHandler by lazy { OrderRetrievalHandler(mongoClient) }
     private val sqsClient: AmazonSQS by lazy {
@@ -64,6 +80,7 @@ class BootstrapVerticle : CoroutineVerticle() {
             .withEndpointConfiguration(EndpointConfiguration(sqsConfig.serviceEndpoint, sqsConfig.signingRegion))
             .build()
     }
+    private val jwtAuth: JWTAuth by lazy { JWTAuth.create(vertx, jwtAuthOptions) }
 
     init {
         registerJacksonModules()
@@ -77,11 +94,7 @@ class BootstrapVerticle : CoroutineVerticle() {
         val router = createAwait(vertx, OPEN_API_PATH)
             .addSuspendingHandlers()
             .addHandlers()
-            .setOptions(
-                routerFactoryOptionsOf(
-                    mountNotImplementedHandler = true
-                )
-            )
+            .setOptions(routerFactoryOptionsOf(mountNotImplementedHandler = true))
             .router
             .errorHandler(SC_BAD_REQUEST, ErrorHandlers()::handleOpenApiValidationError)
             .errorHandler(SC_INTERNAL_SERVER_ERROR, ErrorHandlers()::defaultErrorHandler)
@@ -121,9 +134,13 @@ class BootstrapVerticle : CoroutineVerticle() {
             )
             .addGlobalHandler(LoggerHandlerImpl(true, LoggerFormat.DEFAULT))
             .setBodyHandler(BodyHandler.create(false))
-            .addSecurityHandler("auth", AuthHandler()::handle)
+            .addSecurityHandler("bearerAuth", JWTAuthHandler.create(jwtAuth, "/auth"))
 
     private fun OpenAPI3RouterFactory.addSuspendingHandlers() = this.addSuspendingHandlerByOperationId(
+        handler = AuthHandler(config, jwtAuth)::handle,
+        operationId = HANDLE_AUTH_OPERATION_ID
+    )
+        .addSuspendingHandlerByOperationId(
         handler = OrderStorageHandler(mongoClient)::handleNewOrder,
         operationId = CREATE_ORDER_OPERATION_ID
     )

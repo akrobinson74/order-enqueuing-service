@@ -4,8 +4,40 @@ info:
   title: "OrderEnqueuingService OpenAPI Spec"
   version: "1.0.3"
 paths:
+  /auth:
+    post:
+      summary: Obtain security
+      operationId: handleAuth
+      parameters:
+        - in: header
+          name: username
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: password
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Authenticated
+          headers:
+            Authorization:
+              description: JWT token bearer auth value
+              schema:
+                type: string
+        '401':
+          description: UNAUTHORIZED.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+
   /{platformId}/order:
     post:
+      security:
+        - bearerAuth: []
       summary: "Create a new Order resource to be enqued for processing"
       operationId: createOrder
       parameters:
@@ -29,11 +61,17 @@ paths:
               schema:
                 type: string
         '400':
-          description: INVALID EQUEST.  POST'd requestBody was not well formed
+          description: INVALID REQUEST.  POST'd requestBody was not well formed
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: UNAUTHORIZED.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
         '422':
           description: UNPROCESSABLE_ENTITY.  A field or fields in the requestBody contains an invalid value
           content:
@@ -42,6 +80,8 @@ paths:
                 $ref: '#/components/schemas/ErrorBody'
   /order/{orderId}:
     get:
+      security:
+        - bearerAuth: []
       summary: "Obtain an Order resource possesses the same orderId in the path parameter"
       operationId: getOrder
       parameters:
@@ -57,10 +97,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
+        '401':
+          description: UNAUTHORIZED.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
         '404':
           description: NOT_FOUND.  No Order resource corresponds to ${orderId}
   /{platformId}/order/{orderId}:
     patch:
+      security:
+        - bearerAuth: []
       summary: "Cancel or Return an OrderItem"
       operationId: changeOrderItem
       parameters:
@@ -83,11 +131,19 @@ paths:
       responses:
         '202':
           description: ACCEPTED.  The update has been applied and successfully propagated
+        '401':
+          description: UNAUTHORIZED.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
         '404':
           description: NOT_FOUND.  The targeted resource doesn't exists in our DB.
         '500':
           description: ERROR.  The operation resulted in an internal error.
     put:
+      security:
+        - bearerAuth: []
       summary: "Update the status of an existing Order"
       operationId: putStatus
       parameters:
@@ -110,12 +166,20 @@ paths:
       responses:
         '202':
           description: ACCEPTED.  The update to status has been accepted and propagated.
+        '401':
+          description: UNAUTHORIZED.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
         '404':
           description: NOT_FOUND.  The targeted resource doesn't exists in our DB.
         '500':
           description: ERROR.  The operation resulted in an internal error.
   /{platformId}/orders:
     get:
+      security:
+        - bearerAuth: []
       summary: "Get all orders for the current user"
       operationId: getAllOrders
       parameters:
@@ -156,25 +220,48 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrdersCollection'
+        '401':
+          description: UNAUTHORIZED.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
         '404':
           description: NOT_FOUND.  The current user has no orders
 
   /health:
     get:
+      security:
+        - bearerAuth: []
       summary: Health Check endpoint
       operationId: healthCheck
       responses:
         '200':
           description: Service is OK
+        '401':
+          description: UNAUTHORIZED.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
         '503':
           description: Service is KO'd
   /metrics:
     get:
+      security:
+        - bearerAuth: []
       summary: Endpoint for Prometheus metrics
       operationId: metrics
       responses:
         '200':
           description: Get prometheus metrics
+        '401':
+          description: UNAUTHORIZED.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+
 components:
   schemas:
     Address:
@@ -365,3 +452,12 @@ components:
           description: name of the store
           example: "Mondo Sport"
           type: string
+
+    UnauthorizedError:
+      description: Provided credentials or token is invalid or missing
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

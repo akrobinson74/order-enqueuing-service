@@ -22,9 +22,13 @@ cors:
   allowedOriginPattern: "*"
 mongoConfig:
   connection_string: mongodb://127.0.0.1/test_orders?streamType=netty
-sqsConfig:
+sqs:
   accessKeyId: x
   queueName: test-orders
   serviceEndpoint: http://localhost:9324
   secretAccessKey: x
   signingRegion: elasticmq
+jwtConfig:
+  algorithm: ES256
+  publicKey: frank
+  privateKey: francis

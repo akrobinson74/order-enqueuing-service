@@ -3,10 +3,10 @@ package com.phizzard.es.handlers
 import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.getOrHandle
-import com.phizzard.es.DEFAULT_MAPPER
+import com.phizzard.DEFAULT_MAPPER
+import com.phizzard.PRETTY_PRINTING_MAPPER
 import com.phizzard.es.ORDER_ID_PATH_PARAM_NAME
 import com.phizzard.es.PARTNER_ID_PATH_PARAM_NAME
-import com.phizzard.es.PRETTY_PRINTING_MAPPER
 import com.phizzard.es.extensions.getLogger
 import com.phizzard.es.extensions.getOrderForId
 import com.phizzard.es.extensions.getOrdersForUser

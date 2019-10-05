@@ -11,6 +11,6 @@ COPY build/order-enqueuing-service.jar .
 ADD build/newrelic-5.7.0/ /opt/newrelic/
 RUN mkdir -p /opt/newrelic/logs
 
-EXPOSE 9080
+EXPOSE 80
 
 CMD ["java", "-javaagent:/opt/newrelic/newrelic.jar", "-jar", "order-enqueuing-service.jar", "/opt/config.yml"]

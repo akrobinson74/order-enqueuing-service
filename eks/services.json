@@ -1,0 +1,42 @@
+{
+  "kind": "Service",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "order-enqueuing-service",
+    "namespace": "default",
+    "selfLink": "/api/v1/namespaces/default/services/order-enqueuing-service",
+    "uid": "dfff2544-e936-11e9-943f-0a56c619b98e",
+    "resourceVersion": "186908",
+    "creationTimestamp": "2019-10-07T19:15:50Z",
+    "labels": {
+      "k8s-app": "order-enqueuing-service"
+    }
+  },
+  "spec": {
+    "ports": [
+      {
+        "name": "tcp-80-80-nm86x",
+        "protocol": "TCP",
+        "port": 80,
+        "targetPort": 80,
+        "nodePort": 31151
+      }
+    ],
+    "selector": {
+      "k8s-app": "order-enqueuing-service"
+    },
+    "clusterIP": "10.100.7.171",
+    "type": "LoadBalancer",
+    "sessionAffinity": "None",
+    "externalTrafficPolicy": "Cluster"
+  },
+  "status": {
+    "loadBalancer": {
+      "ingress": [
+        {
+          "hostname": "adfff2544e93611e9943f0a56c619b98-1184816897.eu-central-1.elb.amazonaws.com"
+        }
+      ]
+    }
+  }
+}

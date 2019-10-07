@@ -1,0 +1,115 @@
+oes-dev-tg = arn:aws:elasticloadbalancing:eu-central-1:806353235757:targetgroup/oes-dev-tg/dd82a028c9f90137
+oes-listener = arn:aws:elasticloadbalancing:eu-central-1:806353235757:listener/app/orderservices-elb/dbd652bc3d0450b9/a6f47c5ed9fd4e87
+oes-orderservices-elb = {
+  "access_logs" = [
+    {
+      "bucket" = ""
+      "enabled" = false
+      "prefix" = ""
+    },
+  ]
+  "arn" = "arn:aws:elasticloadbalancing:eu-central-1:806353235757:loadbalancer/app/orderservices-elb/dbd652bc3d0450b9"
+  "arn_suffix" = "app/orderservices-elb/dbd652bc3d0450b9"
+  "dns_name" = "orderservices-elb-1322745023.eu-central-1.elb.amazonaws.com"
+  "enable_deletion_protection" = false
+  "id" = "arn:aws:elasticloadbalancing:eu-central-1:806353235757:loadbalancer/app/orderservices-elb/dbd652bc3d0450b9"
+  "idle_timeout" = 60
+  "internal" = false
+  "load_balancer_type" = "application"
+  "name" = "orderservices-elb"
+  "security_groups" = [
+    "sg-0d710caba32c3be12",
+  ]
+  "subnet_mapping" = [
+    {
+      "allocation_id" = ""
+      "subnet_id" = "subnet-120e2679"
+    },
+    {
+      "allocation_id" = ""
+      "subnet_id" = "subnet-5c8ee821"
+    },
+  ]
+  "subnets" = [
+    "subnet-120e2679",
+    "subnet-5c8ee821",
+  ]
+  "tags" = {}
+  "vpc_id" = "vpc-a1314dca"
+  "zone_id" = "Z215JYRZR1TBD5"
+}
+ops-dev-tg = arn:aws:elasticloadbalancing:eu-central-1:806353235757:targetgroup/ops-dev-tg/6d8b925417415332
+ops-orderservices-elb = {
+  "access_logs" = [
+    {
+      "bucket" = ""
+      "enabled" = false
+      "prefix" = ""
+    },
+  ]
+  "arn" = "arn:aws:elasticloadbalancing:eu-central-1:806353235757:loadbalancer/app/ops-orderservices-elb/078887ba0ba9e242"
+  "arn_suffix" = "app/ops-orderservices-elb/078887ba0ba9e242"
+  "dns_name" = "ops-orderservices-elb-1595253800.eu-central-1.elb.amazonaws.com"
+  "enable_deletion_protection" = false
+  "id" = "arn:aws:elasticloadbalancing:eu-central-1:806353235757:loadbalancer/app/ops-orderservices-elb/078887ba0ba9e242"
+  "idle_timeout" = 60
+  "internal" = false
+  "load_balancer_type" = "application"
+  "name" = "ops-orderservices-elb"
+  "security_groups" = [
+    "sg-0d710caba32c3be12",
+  ]
+  "subnet_mapping" = [
+    {
+      "allocation_id" = ""
+      "subnet_id" = "subnet-120e2679"
+    },
+    {
+      "allocation_id" = ""
+      "subnet_id" = "subnet-2d89fa60"
+    },
+    {
+      "allocation_id" = ""
+      "subnet_id" = "subnet-5c8ee821"
+    },
+  ]
+  "subnets" = [
+    "subnet-120e2679",
+    "subnet-2d89fa60",
+    "subnet-5c8ee821",
+  ]
+  "tags" = {}
+  "vpc_id" = "vpc-a1314dca"
+  "zone_id" = "Z215JYRZR1TBD5"
+}
+ops-prod-tg = arn:aws:elasticloadbalancing:eu-central-1:806353235757:targetgroup/ops-tg/6afd9550e5990247
+ops-stage-tg = arn:aws:elasticloadbalancing:eu-central-1:806353235757:targetgroup/ops-stage-tg/7173a6b2c5dd9a6c
+order_services_sg = sg-0675d547eab997ae0
+phizzard-route-53 = ZE42I9BMPFVSU
+phizzard-service-role = arn:aws:iam::806353235757:role/phizzard-servicerole
+subnet-euc-1a = subnet-120e2679
+subnet-euc-1b = subnet-5c8ee821
+subnet-euc-1c = subnet-2d89fa60
+vpc_phizzard = {
+  "arn" = "arn:aws:ec2:eu-central-1:806353235757:vpc/vpc-a1314dca"
+  "cidr_block" = "10.0.0.0/16"
+  "cidr_block_associations" = [
+    {
+      "association_id" = "vpc-cidr-assoc-e9ce8981"
+      "cidr_block" = "10.0.0.0/16"
+      "state" = "associated"
+    },
+  ]
+  "default" = false
+  "dhcp_options_id" = "dopt-1a55bd73"
+  "enable_dns_hostnames" = true
+  "enable_dns_support" = true
+  "id" = "vpc-a1314dca"
+  "instance_tenancy" = "default"
+  "main_route_table_id" = "rtb-15f51c7f"
+  "owner_id" = "806353235757"
+  "state" = "available"
+  "tags" = {
+    "Name" = "vpc phizzard"
+  }
+}

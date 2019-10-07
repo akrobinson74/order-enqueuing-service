@@ -1,0 +1,58 @@
+[
+  {
+    "cpu": 512,
+    "environment": [
+      {
+        "name": "AWS_ACCESS_KEY_ID",
+        "value": "${aws_key}"
+      },
+      {
+        "name": "AWS_SECRET_ACCESS_KEY",
+        "value": "${aws_secret}"
+      },
+      {
+        "name": "ENV",
+        "value": "${deployment_tier}"
+      },
+      {
+        "name": "NR_ACCOUNT_ID",
+        "value": "${nr_account_id}"
+      },
+      {
+        "name": "NR_INSIGHTS_KEY",
+        "value": "${nr_insights_key}"
+      },
+      {
+        "name": "NEW_RELIC_APP_NAME",
+        "value": "${app_name}"
+      },
+      {
+        "name": "NEW_RELIC_LICENSE_KEY",
+        "value": "${nr_license_key}"
+      },
+      {
+        "name": "NEW_RELIC_PROCESS_HOST_DISPLAY_NAME",
+        "value": "${nr_insights_key}"
+      }
+    ],
+    "essential": true,
+    "image": "806353235757.dkr.ecr.eu-central-1.amazonaws.com/${project}:${tag}",
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "ecs/${env}/oes",
+        "awslogs-region": "${aws_region}",
+        "awslogs-stream-prefix": "${tag}"
+      }
+    },
+    "memoryReservation": 1024,
+    "name": "${project}",
+    "portMappings": [
+      {
+        "hostPort": 0,
+        "protocol": "tcp",
+        "containerPort": ${containerPort}
+      }
+    ]
+  }
+]

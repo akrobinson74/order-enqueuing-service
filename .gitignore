@@ -117,3 +117,7 @@ integration-test/bin/
 **/.terraform/
 misc/
 !app/src/main/resources/**/*.jar
+!/eks/metrics-server-0.3.5/
+!/eks/ecsdemo-frontend/
+!/eks/ecsdemo-crystal/
+!/eks/ecsdemo-nodejs/

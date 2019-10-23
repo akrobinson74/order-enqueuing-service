@@ -121,3 +121,4 @@ misc/
 !/eks/ecsdemo-frontend/
 !/eks/ecsdemo-crystal/
 !/eks/ecsdemo-nodejs/
+*.plan

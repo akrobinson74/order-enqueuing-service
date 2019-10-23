@@ -1,0 +1,32 @@
+{
+  "kind": "Service",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "kubernetes",
+    "namespace": "default",
+    "selfLink": "/api/v1/namespaces/default/services/kubernetes",
+    "uid": "34bea1ab-e96b-11e9-943f-0a56c619b98e",
+    "resourceVersion": "224495",
+    "creationTimestamp": "2019-10-08T01:30:26Z",
+    "labels": {
+      "component": "apiserver",
+      "provider": "kubernetes"
+    }
+  },
+  "spec": {
+    "ports": [
+      {
+        "name": "https",
+        "protocol": "TCP",
+        "port": 443,
+        "targetPort": 443
+      }
+    ],
+    "clusterIP": "10.100.0.1",
+    "type": "ClusterIP",
+    "sessionAffinity": "None"
+  },
+  "status": {
+    "loadBalancer": {}
+  }
+}

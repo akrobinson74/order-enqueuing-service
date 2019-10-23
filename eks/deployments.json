@@ -6,7 +6,6 @@
     "namespace": "default",
     "selfLink": "/apis/extensions/v1beta1/namespaces/default/deployments/order-enqueuing-service",
     "uid": "dffa679b-e936-11e9-943f-0a56c619b98e",
-    "resourceVersion": "188087",
     "generation": 1,
     "creationTimestamp": "2019-10-07T19:15:50Z",
     "labels": {
@@ -35,7 +34,7 @@
         "containers": [
           {
             "name": "order-enqueuing-service",
-            "image": "806353235757.dkr.ecr.eu-central-1.amazonaws.com/order-enqueuing-service:dev",
+            "image": "806353235757.dkr.ecr.eu-central-1.amazonaws.com/order-enqueuing-service:latest",
             "env": [
               {
                 "name": "AWS_ACCESS_KEY_ID",
@@ -46,12 +45,36 @@
                 "value": "3dYqPjZJfWyhJwDylaf1gsGvr6kfx6n08E1tl1yQ"
               },
               {
-                "name": "NR_LICENSE_KEY",
+                "name": "NEW_RELIC_LICENSE_KEY",
                 "value": "eu01xx673cb00245fab11f9a5f0b87111a954bbf"
               },
               {
                 "name": "NR_ACCOUNT_ID",
                 "value": "2312358"
+              },
+              {
+                "name": "NR_INSIGHTS_KEY",
+                "value": "NoeykRu6b3ze_lCGyX3Z0Bk2tB3G3ZJh"
+              },
+              {
+                "name": "JWT_PUBLIC_KEY",
+                "value": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAENyvVJ/AN0fPTE7vJCieXo/mMAnIB\n7k9YBqEuC23Y6JFdrM/5z8VrKZ4UVz7WfrnoPGo5PbBUVskezWTVXpws4Q=="
+              },
+              {
+                "name": "JWT_PRIVATE_KEY",
+                "value": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg3hHwF/cw/PxvY83l\n6JWJfu57S1LtCpFbB2k6cwJzgUWhRANCAAQ3K9Un8A3R89MTu8kKJ5ej+YwCcgHu\nT1gGoS4LbdjokV2sz/nPxWspnhRXPtZ+ueg8ajk9sFRWyR7NZNVenCzh"
+              },
+              {
+                "name": "AUTH_USERNAME",
+                "value": "chico"
+              },
+              {
+                "name": "AUTH_PASSWORD",
+                "value": "ntheman"
+              },
+              {
+                "name": "NEW_RELIC_APP_NAME",
+                "value": "OrderEnqueuingService"
               }
             ],
             "resources": {},
@@ -79,29 +102,5 @@
     },
     "revisionHistoryLimit": 10,
     "progressDeadlineSeconds": 600
-  },
-  "status": {
-    "observedGeneration": 1,
-    "replicas": 2,
-    "updatedReplicas": 2,
-    "unavailableReplicas": 2,
-    "conditions": [
-      {
-        "type": "Progressing",
-        "status": "True",
-        "lastUpdateTime": "2019-10-07T19:16:05Z",
-        "lastTransitionTime": "2019-10-07T19:15:50Z",
-        "reason": "NewReplicaSetAvailable",
-        "message": "ReplicaSet \"order-enqueuing-service-785758c96c\" has successfully progressed."
-      },
-      {
-        "type": "Available",
-        "status": "False",
-        "lastUpdateTime": "2019-10-07T19:19:23Z",
-        "lastTransitionTime": "2019-10-07T19:19:23Z",
-        "reason": "MinimumReplicasUnavailable",
-        "message": "Deployment does not have minimum availability."
-      }
-    ]
   }
 }

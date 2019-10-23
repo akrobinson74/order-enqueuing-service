@@ -23,7 +23,7 @@ variable "aws_region" {
 }
 variable "aws_secret_access_key" {}
 variable "cluster_name" {
-  default = "order-services"
+  default = "order-enqueuing-service-cluster"
 }
 variable "deployment_tier" {
   default = "dev"
@@ -63,19 +63,131 @@ data "aws_ami" "amazon-linux" {
 }
 
 resource "aws_ecs_cluster" "oes_cluster" {
-  name = "order-enqueuing-service-cluster"
+  name = "${var.cluster_name}"
+}
+
+resource "aws_iam_role" "oes_iam_instance_role" {
+  name = "oes-iam-instance-role"
+
+  assume_role_policy = <<EOF
+{
+ "Version": "2008-10-17",
+ "Statement": [
+   {
+     "Sid": "",
+     "Effect": "Allow",
+     "Principal": {
+       "Service": "ec2.amazonaws.com"
+     },
+     "Action": "sts:AssumeRole"
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "oes_iam_instance_role_policy" {
+  name = "oes-iam-instance-role-policy"
+  role = "${aws_iam_role.oes_iam_instance_role.id}"
+
+  policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Effect": "Allow",
+     "Action": [
+       "ecs:CreateCluster",
+       "ecs:DeregisterContainerInstance",
+       "ecs:DiscoverPollEndpoint",
+       "ecs:Poll",
+       "ecs:RegisterContainerInstance",
+       "ecs:StartTelemetrySession",
+       "ecs:Submit*",
+       "ecr:GetAuthorizationToken",
+       "ecr:BatchCheckLayerAvailability",
+       "ecr:GetDownloadUrlForLayer",
+       "ecr:BatchGetImage",
+       "logs:CreateLogStream",
+       "logs:PutLogEvents"
+     ],
+     "Resource": "*"
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_role" "oes_iam_service_role" {
+  name = "oes-iam-service-role"
+
+  assume_role_policy = <<EOF
+{
+ "Version": "2008-10-17",
+ "Statement": [
+   {
+     "Sid": "",
+     "Effect": "Allow",
+     "Principal": {
+       "Service": "ecs.amazonaws.com"
+     },
+     "Action": "sts:AssumeRole"
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "oes_iam_service_role_policy" {
+  name = "oes-iam-service-role-policy"
+  role = "${aws_iam_role.oes_iam_service_role.id}"
+
+  policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Effect": "Allow",
+     "Action": [
+       "ec2:AuthorizeSecurityGroupIngress",
+       "ec2:Describe*",
+       "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+       "elasticloadbalancing:DeregisterTargets",
+       "elasticloadbalancing:Describe*",
+       "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+       "elasticloadbalancing:RegisterTargets"
+     ],
+     "Resource": "*"
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_instance_profile" "oes_instance_profile" {
+  name = "oes-iam-instance-profile"
+  role = "${aws_iam_role.oes_iam_instance_role.name}"
 }
 
 data "template_file" "user_data" {
   template = "${file("${path.module}/user-data.sh")}"
+
+  vars = {
+    cluster_name = "${var.cluster_name}"
+  }
 }
 
 resource "aws_launch_configuration" "oes_dev_launch" {
+  iam_instance_profile = "${aws_iam_instance_profile.oes_instance_profile.id}"
   image_id = "${data.aws_ami.amazon-linux.id}"
   instance_type = "t2.small"
+  key_name = "akr-key-pair1"
   name_prefix = "oes-launch-conf-"
-  security_groups = [
-    "${data.terraform_remote_state.info.outputs.order_services_sg}"]
+  security_groups = ["${data.terraform_remote_state.info.outputs.order_services_sg}"]
+
+  root_block_device {
+    volume_size = "8"
+  }
 
   user_data = "${data.template_file.user_data.rendered}"
 
@@ -85,17 +197,18 @@ resource "aws_launch_configuration" "oes_dev_launch" {
 }
 
 resource "aws_autoscaling_group" "oes_scaling" {
-//  availability_zones = [
-//    "eu-central-1a",
-//    "eu-central-1b",
-//    "eu-central-1c"]
-  default_cooldown = "30"
+  availability_zones = [
+    "eu-central-1a",
+    "eu-central-1b",
+    "eu-central-1c"]
+  default_cooldown = "300"
   depends_on = ["aws_launch_configuration.oes_dev_launch"]
-  health_check_grace_period = "120"
-  health_check_type = "ELB"
+  desired_capacity = "2"
+  health_check_grace_period = "300"
+  health_check_type = "EC2"
   launch_configuration = "${aws_launch_configuration.oes_dev_launch.name}"
-  max_size = 3
-  min_size = 1
+  max_size = "6"
+  min_size = "2"
   name = "oes_autoscaling_group"
   vpc_zone_identifier = [
     "${data.terraform_remote_state.info.outputs.subnet-euc-1a}",
@@ -116,10 +229,11 @@ data template_file "task_def" {
     aws_region = "${var.aws_region}"
     aws_secret = "${var.aws_secret_access_key}"
     cluster_name = "${var.cluster_name}"
-    container_port = "80"
-    containerPort = 80
+    container_port = "9080"
+    containerPort = 9080
     deployment_tier = "${var.deployment_tier}"
     env = "dev"
+    host_name = "oes${var.deployment_tier == "prod" ? "" : "-${var.deployment_tier}"}.phizzard.app"
     inbound_port = "${var.inbound_port}"
     nr_account_id = "${var.nr_account_id}"
     nr_insights_key = "${var.nr_insights_key}"
@@ -139,55 +253,83 @@ resource "aws_cloudwatch_log_group" "ecs_oes" {
 resource "aws_ecs_task_definition" "oes_task_def" {
   container_definitions = "${data.template_file.task_def.rendered}"
   family = "oes_${var.deployment_tier}"
+  network_mode = "bridge"
 }
 
-# imported by arn
-resource "aws_alb_target_group" "oes-dev-tg" {
+resource "aws_alb_target_group" "oes-ecs-tg" {
+  name = "oes-ecs-tg"
   port = 80
   protocol = "HTTP"
-  vpc_id = "vpc-a1314dca"
+  vpc_id = "${data.terraform_remote_state.info.outputs.vpc_phizzard.id}"
 
   health_check {
     path = "/health"
     matcher = "200"
   }
+
+  stickiness {
+    type = "lb_cookie"
+  }
+}
+
+data "aws_acm_certificate" "sslcert" {
+  domain = "pro.oes.phizzard.app"
+}
+
+resource "aws_alb" "oes_alb" {
+  name = "oes-alb"
+  internal = false
+  security_groups = ["${data.terraform_remote_state.info.outputs.order_services_sg}"]
+  subnets = [
+    "${data.terraform_remote_state.info.outputs.subnet-euc-1a}",
+    "${data.terraform_remote_state.info.outputs.subnet-euc-1b}",
+    "${data.terraform_remote_state.info.outputs.subnet-euc-1c}"
+  ]
 }
 
 resource "aws_alb_listener" "oes_dev_listener" {
   default_action {
     type = "forward"
-    target_group_arn = "${aws_alb_target_group.oes-dev-tg.arn}"
+    target_group_arn = "${aws_alb_target_group.oes-ecs-tg.arn}"
   }
 
-  load_balancer_arn = "arn:aws:elasticloadbalancing:eu-central-1:806353235757:loadbalancer/app/orderservices-elb/dbd652bc3d0450b9"
+  certificate_arn = "${data.aws_acm_certificate.sslcert.arn}"
+  load_balancer_arn = "${aws_alb.oes_alb.arn}"
   port = 443
+  protocol = "HTTPS"
+  ssl_policy = "ELBSecurityPolicy-2016-08"
 }
 
 resource "aws_ecs_service" "oes_service" {
   cluster = "${aws_ecs_cluster.oes_cluster.id}"
   deployment_maximum_percent = 200
   deployment_minimum_healthy_percent = 50
-  desired_count = 1
-  iam_role = "arn:aws:iam::806353235757:role/phizzard-servicerole"
+  desired_count = 2
+  iam_role = "${aws_iam_role.oes_iam_service_role.arn}"
   name = "oes-ecs-${var.deployment_tier}"
   task_definition = "${aws_ecs_task_definition.oes_task_def.arn}"
 
-  depends_on = ["aws_alb_target_group.oes-dev-tg"]
+  depends_on = ["aws_alb_target_group.oes-ecs-tg","aws_iam_role.oes_iam_service_role"]
+
+  ordered_placement_strategy {
+    type = "spread"
+    field = "instanceId"
+  }
 
   load_balancer {
     container_name = "order-enqueuing-service"
-    container_port = 80
-    target_group_arn = "${data.terraform_remote_state.info.outputs.ops-dev-tg}"
+    container_port = 9080
+    target_group_arn = "${aws_alb_target_group.oes-ecs-tg.id}"
   }
 }
 
 resource "aws_alb_listener_rule" "oes_service" {
-  listener_arn = "${data.terraform_remote_state.info.outputs.oes-listener}"
+  listener_arn = "${aws_alb_listener.oes_dev_listener.arn}"
   priority     = "100"
 
   action {
     type             = "forward"
-    target_group_arn = "${data.terraform_remote_state.info.outputs.oes-dev-tg}"
+    target_group_arn = "${aws_alb_target_group.oes-ecs-tg.arn}"
   }
 
   condition {
@@ -195,6 +337,7 @@ resource "aws_alb_listener_rule" "oes_service" {
     values = ["oes${var.deployment_tier == "prod" ? "" : "-${var.deployment_tier}"}.phizzard.app"]
   }
 }
+
 //data "template_file" "user_data_oes" {
 //  template = "${file("${path.module}/../user-data-amazon-linux-dev.sh")}"
 //
@@ -249,6 +392,7 @@ resource "aws_alb_listener_rule" "oes_service" {
 //resource "aws_alb_target_group_attachment" "oes_dev_tg" {
 //  port = 80
 //  target_group_arn = "${data.terraform_remote_state.info.outputs.ops-dev-tg}"
+//  target_id = ""
 //}
 //
 //output "oes-public-ip" {

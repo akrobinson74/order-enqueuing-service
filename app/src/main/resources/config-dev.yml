@@ -30,3 +30,6 @@ sqsConfig:
   secretAccessKey: 3dYqPjZJfWyhJwDylaf1gsGvr6kfx6n08E1tl1yQ
   signingRegion: eu-central-1
 jwtConfig:
+  algorithm: ES256
+  publicKey: frank
+  privateKey: francis

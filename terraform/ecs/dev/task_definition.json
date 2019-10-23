@@ -24,7 +24,7 @@
       },
       {
         "name": "NEW_RELIC_APP_NAME",
-        "value": "${app_name}"
+        "value": "${app_name};${app_name}-${deployment_tier}"
       },
       {
         "name": "NEW_RELIC_LICENSE_KEY",
@@ -32,7 +32,7 @@
       },
       {
         "name": "NEW_RELIC_PROCESS_HOST_DISPLAY_NAME",
-        "value": "${nr_insights_key}"
+        "value": "${host_name}"
       }
     ],
     "essential": true,

@@ -3,8 +3,8 @@
 yum install -y aws-cli
 yum update -y
 yum -y install ecs-init awslogs
-echo ECS_CLUSTER=order-enqueuing-service-cluster >> /etc/ecs/ecs.config
-echo ECS_LOGFILE=/log/ecs-agent.log >> /etc/ecs/ecs.config
+echo ECS_CLUSTER=${cluster_name} >> /etc/ecs/ecs.config
+echo ECS_LOGFILE=/var/log/ecs-agent.log >> /etc/ecs/ecs.config
 
 mkdir -p /var/log/ecs
 mkdir -p /var/awslogs/state

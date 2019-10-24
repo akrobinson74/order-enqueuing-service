@@ -338,48 +338,6 @@ resource "aws_alb_listener_rule" "oes_service" {
   }
 }
 
-//data "template_file" "user_data_oes" {
-//  template = "${file("${path.module}/../user-data-amazon-linux-dev.sh")}"
-//
-//  vars = {
-//    app_name = "OrderEnqueuingService"
-//    aws_key = "${var.aws_access_key_id}"
-//    aws_region = "${var.aws_region}"
-//    aws_secret = "${var.aws_secret_access_key}"
-//    cluster_name = "${var.cluster_name}"
-//    container_port = "9080"
-//    deployment_tier = "${var.deployment_tier}"
-//    inbound_port = "${var.inbound_port}"
-//    nr_account_id = "${var.nr_account_id}"
-//    nr_insights_key = "${var.nr_insights_key}"
-//    nr_license_key = "${var.nr_license_key}"
-//    project = "order-enqueuing-service"
-//    service = "${var.service}"
-//    version = "${var.version-tag}"
-//  }
-//}
-//
-//resource "aws_instance" "oes" {
-//  ami = "${data.aws_ami.amazon-linux.id}"
-//  associate_public_ip_address = true
-//  instance_type = "t2.small"
-//  key_name = "akr-key-pair1"
-//  monitoring = true
-//  user_data = "${data.template_file.user_data_oes.rendered}"
-//
-//  # order svcs security group: order_services_sg
-//  security_groups = [
-//    "sg-0675d547eab997ae0",
-//  ]
-//
-//  # vpc phizzard subnet for eu-central-1a
-//  subnet_id = "subnet-120e2679"
-//
-//  tags = {
-//    Name = "oes-${var.deployment_tier}"
-//  }
-//}
-//
 //resource "aws_route53_record" "oes" {
 //  name = "oes${var.deployment_tier == "prod" ? "" : "-${var.deployment_tier}"}.phizzard.app"
 //  records = [

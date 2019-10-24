@@ -94,7 +94,7 @@ pipelines:
           - docker
           - ubuntu
         deployment: test
-        trigger: automatic
+        trigger: manual
         script:
           - export APP_ENV=dev
           - apt-get update && apt-get install -y curl unzip python-pip build-essential

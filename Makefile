@@ -47,7 +47,7 @@ release: build-docker
 	docker push $(DOCKERREPO):dev
 
 rollout-dev:
-	cd terraform/simple-ec2/dev && terraform init -upgrade && terraform apply -auto-approve -var 'version-tag=$(VERSION)'
+	cd terraform/ecs/dev && terraform init -upgrade && terraform apply -auto-approve -var 'version-tag=$(VERSION)'
 
 rollout-staging:
 	cd terraform/simple-ec2/stage && terraform init -upgrade && terraform apply -auto-approve -var 'version-tag=$(VERSION)'
